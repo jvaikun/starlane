@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://ui/SkillButton.gd" type="Script" id=2]
+
+[node name="SkillButton" type="TextureButton"]
+margin_right = 32.0
+margin_bottom = 32.0
+script = ExtResource( 2 )
+
+[node name="Sweep" type="TextureProgress" parent="."]
+modulate = Color( 0.4, 0.4, 0.4, 0.784314 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+fill_mode = 5
+
+[node name="Cooldown" type="Timer" parent="."]
+one_shot = true
+
+[node name="Label" type="Label" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_top = -14.0
+margin_right = 32.0
+text = "Z"
+
+[connection signal="pressed" from="." to="." method="_on_SkillButton_pressed"]
+[connection signal="timeout" from="Cooldown" to="." method="_on_Cooldown_timeout"]
