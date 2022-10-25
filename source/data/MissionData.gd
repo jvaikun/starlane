@@ -1,4 +1,5 @@
 extends Resource
+class_name MissionData
 
 export (String) var title = "Mission 1"
 export (String) var subtitle = "Chain of Command"

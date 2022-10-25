@@ -1,10 +1,8 @@
-[gd_resource type="Resource" load_steps=3 format=2]
+[gd_resource type="Resource" load_steps=2 format=2]
 
 [ext_resource path="res://data/MissionData.gd" type="Script" id=1]
-[ext_resource path="res://bosses/EnemyBoss.tscn" type="PackedScene" id=2]
 
 [resource]
 script = ExtResource( 1 )
 title = "Mission 1"
 subtitle = "Chain of Command"
-boss = ExtResource( 2 )

@@ -6,5 +6,5 @@
 [resource]
 script = ExtResource( 1 )
 title = "Mission 9"
-subtitle = "Ninth Mission"
+subtitle = "Survival"
 boss = ExtResource( 2 )

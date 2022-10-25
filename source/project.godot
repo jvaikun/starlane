@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Resource",
+"class": "MissionData",
+"language": "GDScript",
+"path": "res://data/MissionData.gd"
+} ]
+_global_script_class_icons={
+"MissionData": ""
+}
+
 [application]
 
 config/name="Concord Assault Remake"

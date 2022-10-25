@@ -6,5 +6,5 @@
 [resource]
 script = ExtResource( 1 )
 title = "Mission 12"
-subtitle = "Not a Chance in Hell"
+subtitle = "A Snowball's Chance"
 boss = ExtResource( 2 )
