@@ -82,7 +82,6 @@ texture = ExtResource( 3 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 4 )
-frame = 1
 playing = true
 
 [connection signal="area_entered" from="." to="." method="_on_Player_area_entered"]

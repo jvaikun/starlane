@@ -27,7 +27,7 @@ func _ready():
 	]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if self.global_position.distance_to(path[destination]) < 4:
 		destination += 1
 		if destination >= path.size():

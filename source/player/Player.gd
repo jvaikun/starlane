@@ -28,7 +28,6 @@ func set_hp(value):
 
 
 func set_shield(value):
-	var overflow = 0
 	if value < 0:
 		shield = 0
 		self.hp += value
