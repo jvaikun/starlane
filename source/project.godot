@@ -10,12 +10,30 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Resource",
-"class": "MissionData",
+"class": "EnemyData",
 "language": "GDScript",
-"path": "res://data/MissionData.gd"
+"path": "res://classes/EnemyData.gd"
+}, {
+"base": "Resource",
+"class": "EnemyWave",
+"language": "GDScript",
+"path": "res://classes/EnemyWave.gd"
+}, {
+"base": "Resource",
+"class": "Mission",
+"language": "GDScript",
+"path": "res://classes/Mission.gd"
+}, {
+"base": "Resource",
+"class": "MissionGen",
+"language": "GDScript",
+"path": "res://classes/MissionGen.gd"
 } ]
 _global_script_class_icons={
-"MissionData": ""
+"EnemyData": "",
+"EnemyWave": "",
+"Mission": "",
+"MissionGen": ""
 }
 
 [application]

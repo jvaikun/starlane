@@ -8,8 +8,8 @@ const WEAPON_TIME1 = 2.0
 const WEAPON_TIME2 = 5.0
 const WEAPON_TIME3 = 5.0
 
-var hp = 50.0 setget set_hp
-var shield = 10.0 setget set_shield
+var hp = 5 setget set_hp
+var shield = 3 setget set_shield
 var regen_on = false
 var beam_firing = false
 var defense_on = false
@@ -24,29 +24,23 @@ func set_hp(value):
 		emit_signal("player_dead")
 		queue_free()
 	else:
-		emit_signal("hp_change", float(hp/MAX_HP))
+		emit_signal("hp_change", hp)
 
 
 func set_shield(value):
 	if value < 0:
 		shield = 0
-		self.hp += value
+		self.hp -= 1
 	else:
 		shield = clamp(value, 0, MAX_SHIELD)
 	if shield == MAX_SHIELD:
 		regen_on = false
-	emit_signal("shield_change", float(shield/MAX_SHIELD))
+	emit_signal("shield_change", shield)
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$ShootTimer1.start(0.1)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	if regen_on:
-		self.shield += 5 * delta
+	$ShootTimer1.start(0.2)
 
 
 # Main gun, big fucking bullet, screen clear
@@ -81,7 +75,7 @@ func fire_weapon3():
 
 func _on_ShootTimer1_timeout():
 	var bullet
-	for pos in [$FirePos1, $FirePos2, $FirePos3]:
+	for pos in [$FirePos1, $FirePos2]:
 		bullet = bullet_obj.instance()
 		get_parent().add_child(bullet)
 		bullet.global_position = pos.global_position
@@ -91,32 +85,36 @@ func _on_ShootTimer1_timeout():
 func _on_ShootTimer2_timeout():
 	var missile1 = missile_obj.instance()
 	get_parent().add_child(missile1)
-	missile1.global_position = $FirePos2.global_position
+	missile1.global_position = $FirePos3.global_position
 	missile1.velocity = Vector2(-64, -256)
 	var missile2 = missile_obj.instance()
 	get_parent().add_child(missile2)
-	missile2.global_position = $FirePos2.global_position
+	missile2.global_position = $FirePos3.global_position
 	missile2.velocity = Vector2(-32, -256)
 	var missile3 = missile_obj.instance()
 	get_parent().add_child(missile3)
-	missile3.global_position = $FirePos3.global_position
+	missile3.global_position = $FirePos4.global_position
 	missile3.velocity = Vector2(32, -256)
 	var missile4 = missile_obj.instance()
 	get_parent().add_child(missile4)
-	missile4.global_position = $FirePos3.global_position
+	missile4.global_position = $FirePos4.global_position
 	missile4.velocity = Vector2(64, -256)
 
 
 func _on_Player_area_entered(area):
 	if area.is_in_group("bullet_enemy"):
 		regen_on = false
-		$ShieldRegen.start()
+		$ShieldRegen.start(0.25)
 		self.shield -= area.dmg
 		area.queue_free()
 
 
 func _on_ShieldRegen_timeout():
-	regen_on = true
+	if regen_on:
+		self.shield += 1
+	else:
+		regen_on = true
+		$ShieldRegen.start(1)
 
 
 func _on_SpecialTimer_timeout():

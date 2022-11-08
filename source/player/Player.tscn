@@ -40,20 +40,21 @@ shape = SubResource( 1 )
 [node name="ShootTimer2" type="Timer" parent="."]
 
 [node name="ShieldRegen" type="Timer" parent="."]
-wait_time = 0.25
-one_shot = true
 
 [node name="SpecialTimer" type="Timer" parent="."]
 one_shot = true
 
 [node name="FirePos1" type="Position2D" parent="."]
-position = Vector2( 0, -20 )
+position = Vector2( -3, -18 )
 
 [node name="FirePos2" type="Position2D" parent="."]
-position = Vector2( -12, 5 )
+position = Vector2( 3, -18 )
 
 [node name="FirePos3" type="Position2D" parent="."]
-position = Vector2( 12, 5 )
+position = Vector2( -12, 3 )
+
+[node name="FirePos4" type="Position2D" parent="."]
+position = Vector2( 12, 3 )
 
 [node name="Radius" type="Area2D" parent="."]
 
@@ -82,6 +83,7 @@ texture = ExtResource( 3 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 4 )
+frame = 1
 playing = true
 
 [connection signal="area_entered" from="." to="." method="_on_Player_area_entered"]

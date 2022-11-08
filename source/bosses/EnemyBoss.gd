@@ -21,6 +21,7 @@ func _ready():
 	$ShootTimer.one_shot = false
 	$ShootTimer.start(0.2)
 	hp = 24
+	speed = 150
 	path = [
 		Vector2(64, 64),
 		Vector2(get_viewport_rect().size.x - 64, 64)
@@ -33,7 +34,7 @@ func _process(_delta):
 		if destination >= path.size():
 			destination = 0
 	else:
-		velocity = (path[destination] - self.global_position).normalized() * 150
+		direction = (path[destination] - self.global_position)
 
 func shoot():
 	if is_processing():

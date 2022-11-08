@@ -2,8 +2,11 @@ extends Node2D
 
 var hp = 1 setget set_hp
 var score_value = 5
-var velocity = Vector2(0, 0)
+var direction = Vector2.DOWN
+var speed = 0
 var origin = 0
+var time = 0.0
+var time_scale = 1.0
 
 signal enemy_dead
 
@@ -21,6 +24,10 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	time += delta
+	if time >= time_scale:
+		time = 0.0
+	var velocity = direction.normalized() * speed
 	translate(velocity * delta)
 
 

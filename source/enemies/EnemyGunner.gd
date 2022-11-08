@@ -10,7 +10,7 @@ onready var shot_pattern = [
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	score_value = 10
-	velocity.y = 100
+	speed = 100
 	hp = 2
 
 
