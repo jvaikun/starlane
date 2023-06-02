@@ -53,12 +53,177 @@ const LAST_NAMES = ["Abyss","Agony","Anvil","Arm","Armpit","Avalanche","Axe","Ba
 "Vault","View","Void","Walk","Wasteland","Wealth","Well","Wilderness","Womb",
 "Wrath","Wreck"]
 
+const double_sine = {
+	"pattern":[
+		{
+			"position": Vector2(0.1, 0),
+			"move": "MoveSine",
+			"speed": 150,
+			"time_scale": TAU,
+			"flip_h": false,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.9, 0),
+			"move": "MoveSine",
+			"speed": 150,
+			"time_scale": TAU,
+			"flip_h": true,
+			"delay": 0,
+		},
+	],
+	"repeat_range": [4, 6],
+	"repeat_delay": 0.25,
+}
+
+const double_zigzag = {
+	"pattern":[
+		{
+			"position": Vector2(0.4, 0),
+			"move": "MoveZigZag",
+			"speed": 300,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.6, 0),
+			"move": "MoveZigZag",
+			"speed": 300,
+			"time_scale": 2,
+			"flip_h": true,
+			"delay": 0,
+		},
+	],
+	"repeat_range": [4, 6],
+	"repeat_delay": 0.25,
+}
+
+const double_swoop = {
+	"pattern":[
+		{
+			"position": Vector2(0.2, 0),
+			"move": "MoveDive",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": true,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.8, 0),
+			"move": "MoveDive",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0,
+		},
+	],
+	"repeat_range": [4, 6],
+	"repeat_delay": 0.25,
+}
+
+const wedge = {
+	"pattern":[
+		{
+			"position": Vector2(0.5, 0),
+			"move": "MoveDown",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0.25,
+		},
+		{
+			"position": Vector2(0.4, 0),
+			"move": "MoveDown",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.6, 0),
+			"move": "MoveDown",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0.25,
+		},
+		{
+			"position": Vector2(0.3, 0),
+			"move": "MoveDown",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.7, 0),
+			"move": "MoveDown",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0,
+		},
+	],
+	"repeat_range": [1, 1],
+	"repeat_delay": 0.5,
+}
+
+const wedge_swoop = {
+	"pattern":[
+		{
+			"position": Vector2(0.5, 0),
+			"move": "MoveDown",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0.25,
+		},
+		{
+			"position": Vector2(0.4, 0),
+			"move": "MoveDive",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": true,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.6, 0),
+			"move": "MoveDive",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0.25,
+		},
+		{
+			"position": Vector2(0.3, 0),
+			"move": "MoveDive",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": false,
+			"delay": 0,
+		},
+		{
+			"position": Vector2(0.7, 0),
+			"move": "MoveDive",
+			"speed": 150,
+			"time_scale": 2,
+			"flip_h": true,
+			"delay": 0,
+		},
+	],
+	"repeat_range": [1, 1],
+	"repeat_delay": 0.5,
+}
+
 const MAPS = ["starfield1", "starfield2", "nebula1", "nebula2"]
 const HAZARDS = ["asteroid", "cargo", "meteor", "mines"]
-const WAVES = [
-	preload("res://data/Wave01.tres"),
-	preload("res://data/Wave02.tres"),
-	preload("res://data/Wave03.tres"),
+const SPAWNS = [
+	double_sine,
+	double_swoop,
+	double_zigzag,
+	wedge,
+	wedge_swoop,
 ]
 const BOSSES = [preload("res://bosses/EnemyBoss.tscn")]
 
@@ -73,9 +238,16 @@ func generate_mission():
 	new_mission.name = generate_name()
 	new_mission.map = MAPS[randi() % MAPS.size()]
 	new_mission.hazard = HAZARDS[randi() % HAZARDS.size()]
-	for i in 10:
-		var wave = WAVES[randi() % WAVES.size()]
-		wave.spawn_time = 4.0 + ((randi() % 4)-2) * 0.5
-		new_mission.waves.append(wave)
+	var wave_count = (randi() % 5) + 10
+	for i in wave_count:
+		var my_wave = SPAWNS[randi() % SPAWNS.size()]
+		var my_size = 1
+		if (my_wave.repeat_range[1] - my_wave.repeat_range[0]) > 0:
+			my_size = (randi() % (my_wave.repeat_range[1] - my_wave.repeat_range[0])) + my_wave.repeat_range[0]
+		new_mission.waves.append({
+			"size": my_size,
+			"spawn": my_wave, 
+			"next": 1 + randi() % 2
+		})
 	new_mission.boss = BOSSES[0]
 	return new_mission

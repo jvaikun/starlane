@@ -2,14 +2,16 @@ extends Area2D
 
 const bullet_obj = preload("res://bullets/BulletPlayer.tscn")
 const missile_obj = preload("res://bullets/Missile.tscn")
-const MAX_HP = 50.0
-const MAX_SHIELD = 10.0
+const impact_obj = preload("res://effects/Impact.tscn")
+const explode_obj = preload("res://effects/Explosion.tscn")
+const MAX_HP = 5.0
+const MAX_SHIELD = 5.0
 const WEAPON_TIME1 = 2.0
 const WEAPON_TIME2 = 5.0
 const WEAPON_TIME3 = 5.0
 
 var hp = 5 setget set_hp
-var shield = 3 setget set_shield
+var shield = 5 setget set_shield
 var regen_on = false
 var beam_firing = false
 var defense_on = false
@@ -18,10 +20,14 @@ signal player_dead
 signal hp_change
 signal shield_change
 
+
 func set_hp(value):
 	hp = clamp(value, 0, MAX_HP)
 	if hp == 0:
 		emit_signal("player_dead")
+		var explode_inst = explode_obj.instance()
+		get_parent().add_child(explode_inst)
+		explode_inst.global_position = global_position
 		queue_free()
 	else:
 		emit_signal("hp_change", hp)
@@ -40,7 +46,20 @@ func set_shield(value):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	#$ShootTimer1.start(0.2)
+	pass
+
+
+func warp_in():
+	$AnimationPlayer.play_backwards("warp")
+	yield($AnimationPlayer, "animation_finished")
 	$ShootTimer1.start(0.2)
+
+
+func warp_out():
+	$ShootTimer1.stop()
+	$ShootTimer2.stop()
+	$AnimationPlayer.play("warp")
 
 
 # Main gun, big fucking bullet, screen clear
@@ -106,7 +125,15 @@ func _on_Player_area_entered(area):
 		regen_on = false
 		$ShieldRegen.start(0.25)
 		self.shield -= area.dmg
+		var impact_inst = impact_obj.instance()
+		get_parent().add_child(impact_inst)
+		impact_inst.global_position = area.global_position
 		area.queue_free()
+	elif area.is_in_group("enemies"):
+		regen_on = false
+		$ShieldRegen.start(0.25)
+		self.shield -= 1
+		area.hp -= 1
 
 
 func _on_ShieldRegen_timeout():

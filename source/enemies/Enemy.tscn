@@ -26,5 +26,8 @@ frames = SubResource( 2 )
 
 [node name="VisCheck" type="VisibilityNotifier2D" parent="."]
 
+[node name="ShootTimer" type="Timer" parent="."]
+
 [connection signal="area_entered" from="." to="." method="_on_Enemy_area_entered"]
 [connection signal="screen_exited" from="VisCheck" to="." method="_on_VisCheck_screen_exited"]
+[connection signal="timeout" from="ShootTimer" to="." method="_on_ShootTimer_timeout"]

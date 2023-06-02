@@ -1,30 +1,13 @@
-extends "res://enemies/Enemy.gd"
+extends Enemy
 
 const bullet_obj = preload("res://bullets/BulletEnemy.tscn")
 
-onready var shot_pattern = [
-	{"pos":$ShootPos1, "bullet":bullet_obj, "velocity":Vector2(0, 200)},
-	{"pos":$ShootPos2, "bullet":bullet_obj, "velocity":Vector2(0, 200)}
-]
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	shot_pattern = [
+		{"pos":$ShootPos1, "bullet":bullet_obj, "velocity":Vector2(0, 250)},
+		{"pos":$ShootPos2, "bullet":bullet_obj, "velocity":Vector2(0, 250)}
+	]
+	shot_time = 1.0
 	score_value = 5
 	speed = 150
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-
-func shoot():
-	var bullet_inst
-	for shot in shot_pattern:
-		bullet_inst = shot.bullet.instance()
-		get_parent().add_child(bullet_inst)
-		bullet_inst.global_position = shot.pos.global_position
-		bullet_inst.velocity = shot.velocity
-
-
-func _on_ShootTimer_timeout():
-	shoot()

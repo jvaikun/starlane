@@ -35,10 +35,6 @@ shape = SubResource( 4 )
 frames = SubResource( 3 )
 flip_v = true
 
-[node name="ShootTimer" type="Timer" parent="." index="2"]
-wait_time = 0.5
-autostart = true
-
 [node name="ShootPos1" type="Position2D" parent="." index="3"]
 position = Vector2( -20, 17 )
 
@@ -51,4 +47,6 @@ position = Vector2( 10, 17 )
 [node name="ShootPos4" type="Position2D" parent="." index="6"]
 position = Vector2( 20, 17 )
 
-[connection signal="timeout" from="ShootTimer" to="." method="_on_ShootTimer_timeout"]
+[node name="ShootTimer" parent="." index="7"]
+wait_time = 0.5
+autostart = true

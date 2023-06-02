@@ -3,31 +3,37 @@ extends Control
 const enemy_obj = preload("res://enemies/EnemyDrone.tscn")
 
 var screen_size = Vector2.ZERO
+var generator = MissionGen.new()
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$Timer.one_shot = true
-	$Timer.start(0.5)
+	$Timer.start(1)
 	screen_size = get_viewport_rect().size
 
 
 func _process(delta):
-	for enemy in get_tree().get_nodes_in_group("enemies"):
-		if (enemy.time < enemy.time_scale * 0.5):
-			enemy.direction = Vector2(1, 1)
-		else:
-			enemy.direction = Vector2(-1, 1)
-#		enemy.direction = Vector2(sin(enemy.time), 1)
+	if Input.is_action_just_pressed("ui_accept"):
+		$Player/AnimationPlayer.play("warp")
+
+
+func spawn_wave():
+	var this_wave = generator.SPAWNS[randi() % generator.SPAWNS.size()]
+	for i in 2:
+		for pos in this_wave.pattern:
+			var enemy_inst = enemy_obj.instance()
+			add_child(enemy_inst)
+			#enemy_inst.connect("enemy_dead", self, "update_score")
+			enemy_inst.global_position.x = pos.position.x * screen_size.x
+			enemy_inst.global_position.y = pos.position.y * screen_size.y
+			enemy_inst.move_pattern.set_script(load("res://data/%s.gd" % pos.move))
+			enemy_inst.move_pattern.speed = pos.speed
+			enemy_inst.move_pattern.time_scale = pos.time_scale
+			enemy_inst.move_pattern.flip_h = pos.flip_h
+			yield(get_tree().create_timer(pos.delay), "timeout")
+		yield(get_tree().create_timer(this_wave.repeat_delay), "timeout")
 
 
 func _on_Timer_timeout():
-	var enemy_inst
-	for i in 4:
-		enemy_inst = enemy_obj.instance()
-		add_child(enemy_inst)
-		enemy_inst.time_scale = 2
-		enemy_inst.speed = 150
-		enemy_inst.global_position = Vector2(0.25 * screen_size.x, 0)
-		yield(get_tree().create_timer(0.25), "timeout")
-	$Timer.start(0.5)
+	spawn_wave()
+	#$Timer.stop()
