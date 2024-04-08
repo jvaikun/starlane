@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" uid="uid://y3pee7di0he2" path="res://ui/icons/spiky_field.png" id="1"]
+[ext_resource type="Script" path="res://ui/mission_tile.gd" id="2"]
+
+[node name="MissionTile" type="PanelContainer"]
+offset_right = 172.0
+offset_bottom = 78.0
+script = ExtResource( 2 )
+
+[node name="Body" type="HBoxContainer" parent="."]
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 165.0
+offset_bottom = 71.0
+
+[node name="Icon" type="TextureRect" parent="Body"]
+offset_right = 64.0
+offset_bottom = 64.0
+texture = ExtResource( 1 )
+
+[node name="Text" type="VBoxContainer" parent="Body"]
+offset_left = 68.0
+offset_right = 158.0
+offset_bottom = 64.0
+
+[node name="Title" type="Label" parent="Body/Text"]
+offset_right = 90.0
+offset_bottom = 14.0
+text = "Mission name"
+
+[node name="Map" type="Label" parent="Body/Text"]
+offset_top = 18.0
+offset_right = 90.0
+offset_bottom = 32.0
+text = "Map"
+
+[node name="Hazard" type="Label" parent="Body/Text"]
+offset_top = 36.0
+offset_right = 90.0
+offset_bottom = 50.0
+text = "Hazards"

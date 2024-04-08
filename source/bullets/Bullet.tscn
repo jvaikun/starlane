@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource path="res://bullets/Bullet.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://bullets/bullet.gd" id="1"]
 
 [sub_resource type="RectangleShape2D" id=1]
 resource_local_to_scene = true
@@ -12,6 +12,6 @@ script = ExtResource( 1 )
 [node name="HitBox" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
 
-[node name="VisCheck" type="VisibilityNotifier2D" parent="."]
+[node name="VisCheck" type="VisibleOnScreenNotifier2D" parent="."]
 
 [connection signal="screen_exited" from="VisCheck" to="." method="_on_VisCheck_screen_exited"]

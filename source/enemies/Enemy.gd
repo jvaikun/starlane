@@ -1,10 +1,10 @@
 class_name Enemy
 extends Node2D
 
-const explode_obj = preload("res://effects/Explosion.tscn")
-const impact_obj = preload("res://effects/Impact.tscn")
+const explode_obj = preload("res://effects/explosion.tscn")
+const impact_obj = preload("res://effects/impact.tscn")
 
-var hp = 1 setget set_hp
+var hp = 1: set = set_hp
 var score_value = 5
 var direction = Vector2.DOWN
 var speed = 0
@@ -13,7 +13,7 @@ var time = 0.0
 var time_scale = 1.0
 var shot_pattern = []
 var shot_time = 1.0
-var move_pattern
+var move_pattern = Resource.new()
 
 signal enemy_dead
 
@@ -21,7 +21,7 @@ func set_hp(value):
 	hp = value
 	if hp <= 0:
 		emit_signal("enemy_dead", score_value)
-		var explode_inst = explode_obj.instance()
+		var explode_inst = explode_obj.instantiate()
 		get_parent().add_child(explode_inst)
 		explode_inst.global_position = global_position
 		queue_free()
@@ -42,7 +42,7 @@ func _process(delta):
 func shoot():
 	var bullet_inst
 	for shot in shot_pattern:
-		bullet_inst = shot.bullet.instance()
+		bullet_inst = shot.bullet.instantiate()
 		get_parent().add_child(bullet_inst)
 		bullet_inst.global_position = shot.pos.global_position
 		bullet_inst.velocity = shot.velocity
@@ -56,7 +56,7 @@ func _on_VisCheck_screen_exited():
 func _on_Enemy_area_entered(area):
 	if area.is_in_group("bullet_player"):
 		self.hp -= area.dmg
-		var impact_inst = impact_obj.instance()
+		var impact_inst = impact_obj.instantiate()
 		get_parent().add_child(impact_inst)
 		impact_inst.global_position = area.global_position
 		area.queue_free()

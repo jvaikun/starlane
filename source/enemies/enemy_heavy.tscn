@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" uid="uid://bi8wvwrkmn2xt" path="res://enemies/enemy.tscn" id="1"]
+[ext_resource type="Texture2D" uid="uid://cfel1uc4c0ldl" path="res://enemies/enemy_heavy.png" id="2"]
+[ext_resource type="Script" path="res://enemies/enemy_heavy.gd" id="3"]
+
+[sub_resource type="RectangleShape2D" id=4]
+resource_local_to_scene = true
+extents = Vector2( 32, 24 )
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 64, 48 )
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 2 )
+region = Rect2( 64, 0, 64, 48 )
+
+[sub_resource type="SpriteFrames" id=3]
+resource_local_to_scene = true
+animations = [ {
+"frames": [ SubResource( 1 ), SubResource( 2 ) ],
+"loop": true,
+"name": "default",
+"speed": 15.0
+} ]
+
+[node name="EnemyHeavy" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="HitBox" parent="." index="0"]
+shape = SubResource( 4 )
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+frames = SubResource( 3 )
+flip_v = true
+
+[node name="ShootPos1" type="Marker2D" parent="." index="3"]
+position = Vector2( -20, 17 )
+
+[node name="ShootPos2" type="Marker2D" parent="." index="4"]
+position = Vector2( -10, 17 )
+
+[node name="ShootPos3" type="Marker2D" parent="." index="5"]
+position = Vector2( 10, 17 )
+
+[node name="ShootPos4" type="Marker2D" parent="." index="6"]
+position = Vector2( 20, 17 )
+
+[node name="ShootTimer" parent="." index="7"]
+wait_time = 0.5
+autostart = true

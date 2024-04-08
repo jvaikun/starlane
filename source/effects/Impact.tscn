@@ -1,31 +1,41 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=7 format=3 uid="uid://c8cixlbyu7ylk"]
 
-[ext_resource path="res://effects/impact.png" type="Texture" id=1]
-[ext_resource path="res://effects/Impact.gd" type="Script" id=2]
+[ext_resource type="Texture2D" uid="uid://c4htf3e6gdkcx" path="res://effects/impact.png" id="1"]
+[ext_resource type="Script" path="res://effects/impact.gd" id="2"]
 
-[sub_resource type="AtlasTexture" id=1]
-atlas = ExtResource( 1 )
-region = Rect2( 0, 0, 16, 16 )
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 16, 16)
 
-[sub_resource type="AtlasTexture" id=2]
-atlas = ExtResource( 1 )
-region = Rect2( 16, 0, 16, 16 )
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("1")
+region = Rect2(16, 0, 16, 16)
 
-[sub_resource type="AtlasTexture" id=3]
-atlas = ExtResource( 1 )
-region = Rect2( 32, 0, 16, 16 )
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("1")
+region = Rect2(32, 0, 16, 16)
 
-[sub_resource type="SpriteFrames" id=4]
-animations = [ {
-"frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ) ],
-"loop": true,
-"name": "default",
+[sub_resource type="SpriteFrames" id="4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("1")
+}, {
+"duration": 1.0,
+"texture": SubResource("2")
+}, {
+"duration": 1.0,
+"texture": SubResource("3")
+}],
+"loop": false,
+"name": &"default",
 "speed": 15.0
-} ]
+}]
 
-[node name="Impact" type="AnimatedSprite"]
-frames = SubResource( 4 )
-playing = true
-script = ExtResource( 2 )
+[node name="Impact" type="AnimatedSprite2D"]
+sprite_frames = SubResource("4")
+autoplay = "default"
+frame_progress = 0.687571
+script = ExtResource("2")
 
-[connection signal="animation_finished" from="." to="." method="_on_Impact_animation_finished"]
+[connection signal="animation_finished" from="." to="." method="_on_animation_finished"]

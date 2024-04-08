@@ -1,6 +1,5 @@
-# Concord Assault Remake
-This is the code repository for Concord Assault Remake, by Nightingale Studios
+# Starlane Runner
+This is the code repository for Starlane Runner a vertical shmup with Slay The Spire style map/run generation.
 
 ## Directory structure
-/assets - For raw asset files such as images
 /source - Main directory for the Godot project

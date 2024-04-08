@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" uid="uid://bi8wvwrkmn2xt" path="res://enemies/enemy.tscn" id="1"]
+[ext_resource type="Script" path="res://enemies/EnemyTarget.gd" id="3"]
+
+[sub_resource type="RectangleShape2D" id=1]
+resource_local_to_scene = true
+extents = Vector2( 16, 16 )
+
+[sub_resource type="SpriteFrames" id=2]
+resource_local_to_scene = true
+animations = [ {
+"frames": [  ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[node name="EnemyTarget" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="HitBox" parent="." index="0"]
+shape = SubResource( 1 )
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+frames = SubResource( 2 )

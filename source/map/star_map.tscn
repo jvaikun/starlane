@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=3 uid="uid://ssmrmcx8ya76"]
+
+[ext_resource type="Script" path="res://map/star_map.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://d33k0h6vwcvfv" path="res://ui/fonts/Kenney Pixel.ttf" id="2_y8odc"]
+
+[node name="StarMap" type="Control"]
+custom_minimum_size = Vector2(920, 0)
+layout_mode = 3
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="UILeft" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = -68.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="BtnReroll" type="Button" parent="UILeft"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y8odc")
+theme_override_font_sizes/font_size = 32
+text = "Reroll Paths"
+
+[node name="BtnRun" type="Button" parent="UILeft"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y8odc")
+theme_override_font_sizes/font_size = 32
+text = "Confirm Course"
+
+[node name="BtnQuit" type="Button" parent="UILeft"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y8odc")
+theme_override_font_sizes/font_size = 32
+text = "Quit to Menu"
+
+[connection signal="pressed" from="UILeft/BtnReroll" to="." method="_on_btn_reroll_pressed"]
+[connection signal="pressed" from="UILeft/BtnRun" to="." method="_on_btn_run_pressed"]

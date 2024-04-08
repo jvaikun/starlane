@@ -21,7 +21,7 @@ func spawn_wave():
 	var this_wave = generator.SPAWNS[randi() % generator.SPAWNS.size()]
 	for i in 2:
 		for pos in this_wave.pattern:
-			var enemy_inst = enemy_obj.instance()
+			var enemy_inst = enemy_obj.instantiate()
 			add_child(enemy_inst)
 			#enemy_inst.connect("enemy_dead", self, "update_score")
 			enemy_inst.global_position.x = pos.position.x * screen_size.x
@@ -30,8 +30,8 @@ func spawn_wave():
 			enemy_inst.move_pattern.speed = pos.speed
 			enemy_inst.move_pattern.time_scale = pos.time_scale
 			enemy_inst.move_pattern.flip_h = pos.flip_h
-			yield(get_tree().create_timer(pos.delay), "timeout")
-		yield(get_tree().create_timer(this_wave.repeat_delay), "timeout")
+			await get_tree().create_timer(pos.delay).timeout
+		await get_tree().create_timer(this_wave.repeat_delay).timeout
 
 
 func _on_Timer_timeout():

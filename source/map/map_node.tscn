@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3 uid="uid://h53c3sfhrodb"]
+
+[ext_resource type="StyleBox" uid="uid://dmtbk7nk1gbpt" path="res://ui/map_node_normal.stylebox" id="1_3rcto"]
+[ext_resource type="StyleBox" uid="uid://bbcp5f47el5s2" path="res://ui/map_node_select.stylebox" id="2_fhjyp"]
+[ext_resource type="StyleBox" uid="uid://drf1bplra6bo6" path="res://ui/map_node_off.stylebox" id="3_2hv1y"]
+[ext_resource type="Script" path="res://map/map_node.gd" id="4_bqwyl"]
+
+[node name="MapNode" type="Control"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 32.0
+offset_bottom = 32.0
+script = ExtResource("4_bqwyl")
+
+[node name="Lines" type="Node2D" parent="."]
+
+[node name="Button" type="Button" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = ExtResource("1_3rcto")
+theme_override_styles/hover = ExtResource("2_fhjyp")
+theme_override_styles/pressed = ExtResource("2_fhjyp")
+theme_override_styles/disabled = ExtResource("3_2hv1y")
+theme_override_styles/focus = ExtResource("2_fhjyp")
+toggle_mode = true
+icon_alignment = 1
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

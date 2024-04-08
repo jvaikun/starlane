@@ -1,17 +1,17 @@
 extends Area2D
 
-const bullet_obj = preload("res://bullets/BulletPlayer.tscn")
-const missile_obj = preload("res://bullets/Missile.tscn")
-const impact_obj = preload("res://effects/Impact.tscn")
-const explode_obj = preload("res://effects/Explosion.tscn")
+const bullet_obj = preload("res://bullets/bullet_player.tscn")
+const missile_obj = preload("res://bullets/missile.tscn")
+const impact_obj = preload("res://effects/impact.tscn")
+const explode_obj = preload("res://effects/explosion.tscn")
 const MAX_HP = 5.0
 const MAX_SHIELD = 5.0
 const WEAPON_TIME1 = 2.0
 const WEAPON_TIME2 = 5.0
 const WEAPON_TIME3 = 5.0
 
-var hp = 5 setget set_hp
-var shield = 5 setget set_shield
+var hp = 5: set = set_hp
+var shield = 5: set = set_shield
 var regen_on = false
 var beam_firing = false
 var defense_on = false
@@ -25,7 +25,7 @@ func set_hp(value):
 	hp = clamp(value, 0, MAX_HP)
 	if hp == 0:
 		emit_signal("player_dead")
-		var explode_inst = explode_obj.instance()
+		var explode_inst = explode_obj.instantiate()
 		get_parent().add_child(explode_inst)
 		explode_inst.global_position = global_position
 		queue_free()
@@ -52,7 +52,7 @@ func _ready():
 
 func warp_in():
 	$AnimationPlayer.play_backwards("warp")
-	yield($AnimationPlayer, "animation_finished")
+	await $AnimationPlayer.animation_finished
 	$ShootTimer1.start(0.2)
 
 
@@ -71,7 +71,7 @@ func fire_weapon1():
 		elif target.is_in_group("bullet_enemy"):
 			target.queue_free()
 	$SpecialTimer.start(WEAPON_TIME1)
-	$Beam/Sprite.show()
+	$Beam/Sprite2D.show()
 	beam_firing = true
 
 
@@ -88,33 +88,33 @@ func fire_weapon3():
 		if target.is_in_group("bullet_enemy"):
 			target.queue_free()
 	$SpecialTimer.start(WEAPON_TIME3)
-	$Radius/Sprite.show()
+	$Radius/Sprite2D.show()
 	defense_on = true
 
 
 func _on_ShootTimer1_timeout():
 	var bullet
 	for pos in [$FirePos1, $FirePos2]:
-		bullet = bullet_obj.instance()
+		bullet = bullet_obj.instantiate()
 		get_parent().add_child(bullet)
 		bullet.global_position = pos.global_position
 		bullet.velocity = Vector2(0, -256)
 
 
 func _on_ShootTimer2_timeout():
-	var missile1 = missile_obj.instance()
+	var missile1 = missile_obj.instantiate()
 	get_parent().add_child(missile1)
 	missile1.global_position = $FirePos3.global_position
 	missile1.velocity = Vector2(-64, -256)
-	var missile2 = missile_obj.instance()
+	var missile2 = missile_obj.instantiate()
 	get_parent().add_child(missile2)
 	missile2.global_position = $FirePos3.global_position
 	missile2.velocity = Vector2(-32, -256)
-	var missile3 = missile_obj.instance()
+	var missile3 = missile_obj.instantiate()
 	get_parent().add_child(missile3)
 	missile3.global_position = $FirePos4.global_position
 	missile3.velocity = Vector2(32, -256)
-	var missile4 = missile_obj.instance()
+	var missile4 = missile_obj.instantiate()
 	get_parent().add_child(missile4)
 	missile4.global_position = $FirePos4.global_position
 	missile4.velocity = Vector2(64, -256)
@@ -125,7 +125,7 @@ func _on_Player_area_entered(area):
 		regen_on = false
 		$ShieldRegen.start(0.25)
 		self.shield -= area.dmg
-		var impact_inst = impact_obj.instance()
+		var impact_inst = impact_obj.instantiate()
 		get_parent().add_child(impact_inst)
 		impact_inst.global_position = area.global_position
 		area.queue_free()
@@ -146,10 +146,10 @@ func _on_ShieldRegen_timeout():
 
 func _on_SpecialTimer_timeout():
 	beam_firing = false
-	$Beam/Sprite.hide()
+	$Beam/Sprite2D.hide()
 	$ShootTimer2.stop()
 	defense_on = false
-	$Radius/Sprite.hide()
+	$Radius/Sprite2D.hide()
 
 
 func _on_Radius_area_entered(area):

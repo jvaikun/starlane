@@ -1,7 +1,7 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource path="res://bullets/Bullet.tscn" type="PackedScene" id=1]
-[ext_resource path="res://bullets/missile0.png" type="Texture" id=2]
+[ext_resource type="PackedScene" path="res://bullets/bullet.tscn" id="1"]
+[ext_resource type="Texture2D" uid="uid://kgsohimj2mbx" path="res://bullets/missile0.png" id="2"]
 
 [sub_resource type="RectangleShape2D" id=1]
 resource_local_to_scene = true
@@ -29,6 +29,6 @@ animations = [ {
 position = Vector2( 0, -0.5 )
 shape = SubResource( 1 )
 
-[node name="Sprite" type="AnimatedSprite" parent="." index="2"]
+[node name="Sprite2D" type="AnimatedSprite2D" parent="." index="2"]
 frames = SubResource( 4 )
 playing = true

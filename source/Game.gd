@@ -2,21 +2,21 @@ extends Control
 
 enum GameState {TITLE, CHOICE, INTRO, PLAY, OUTRO, PAUSE, END}
 
+const PLAY_AREA = Rect2(370, 0, 540, 720)
 const TITLE_TEXT = "Mission: %d"
-const MISSION_COUNT = 3
 const START_WAIT = 1.0
 const BOSS_WAIT = 2.0
 const HOME_POS = Vector2(0.5, 0.8)
-const player_obj = preload("res://player/Player.tscn")
-const enemy_obj = preload("res://enemies/EnemyDrone.tscn")
+const player_obj = preload("res://player/player.tscn")
+const enemy_obj = preload("res://enemies/enemy_drone.tscn")
 
-onready var skill1 = $HUDRight/SkillButton
-onready var skill2 = $HUDRight/SkillButton2
-onready var skill3 = $HUDRight/SkillButton3
+@onready var skill1 = $UI/HUD/Content/Equip/SkillButton
+@onready var skill2 = $UI/HUD/Content/Equip/SkillButton2
+@onready var skill3 = $UI/HUD/Content/Equip/SkillButton3
 
 var mission_gen = MissionGen.new()
 var player = null
-var state = GameState.TITLE setget set_state
+var state = GameState.TITLE: set = set_state
 var level_index = 1
 var score = 0
 var dir_vector = Vector2.ZERO
@@ -39,24 +39,31 @@ func set_state(value):
 				wave_count = 0
 				boss_spawned = false
 				is_scrolling = false
-				$MainMenu.show()
-				$HUDLeft.hide()
-				$HUDRight.hide()
-				$GameOver.hide()
+				$UI/HUD.hide()
+				$UI/Cutscene.hide()
+				$UI/Title.show()
+				$UI/GameOver.hide()
+				$UI/StarMap.hide()
 			GameState.CHOICE:
 				wave_count = 0
 				boss_spawned = false
 				is_scrolling = false
-				generate_missions()
-				$MissionChoice.update_ui(next_missions)
-				$MissionChoice.show()
+				$UI/HUD.show()
+				$UI/Cutscene.hide()
+				$UI/Title.hide()
+				$UI/GameOver.hide()
+				$UI/StarMap.gen_paths()
+				$UI/StarMap.show()
 			GameState.INTRO:
 				spawn_player()
 				player.warp_in()
-				$HUDLeft.show()
-				$HUDRight.show()
-				$Cutscene/Intro/Title.text = TITLE_TEXT % level_index
-				$Cutscene/Intro/Subtitle.text = active_mission.name
+				$UI/HUD.show()
+				$UI/Title.hide()
+				$UI/GameOver.hide()
+				$UI/StarMap.hide()
+				$UI/Cutscene.show()
+				$UI/Cutscene/Intro/Title.text = TITLE_TEXT % level_index
+				$UI/Cutscene/Intro/Subtitle.text = active_mission.name
 				$AnimationPlayer.play("intro_in")
 			GameState.PLAY:
 				is_scrolling = true
@@ -72,9 +79,11 @@ func set_state(value):
 				pass
 			GameState.END:
 				player.queue_free()
-				$HUDLeft.hide()
-				$HUDRight.hide()
-				$GameOver.show()
+				$UI/HUD.hide()
+				$UI/Title.hide()
+				$UI/GameOver.show()
+				$UI/StarMap.hide()
+				$UI/Cutscene.hide()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -104,8 +113,6 @@ func _process(delta):
 
 func init_game():
 	screen_size = get_viewport_rect().size
-	$MainMenu.hide()
-	$GameOver.hide()
 	score = 0
 	update_score(0)
 	update_hp(5)
@@ -124,21 +131,15 @@ func clear_screen():
 
 func spawn_player():
 	if !is_instance_valid(player):
-		player = player_obj.instance()
+		player = player_obj.instantiate()
 		add_child(player)
 		player.global_position = screen_size * HOME_POS
-		player.connect("player_dead", self, "game_over")
-		player.connect("hp_change", self, "update_hp")
-		player.connect("shield_change", self, "update_shield")
-		skill1.connect("trigger_skill", player, "fire_weapon1")
-		skill2.connect("trigger_skill", player, "fire_weapon2")
-		skill3.connect("trigger_skill", player, "fire_weapon3")
-
-
-func generate_missions():
-	next_missions.clear()
-	for i in MISSION_COUNT:
-		next_missions.append(mission_gen.generate_mission())
+		player.connect("player_dead", Callable(self, "game_over"))
+		player.connect("hp_change", Callable(self, "update_hp"))
+		player.connect("shield_change", Callable(self, "update_shield"))
+		skill1.connect("trigger_skill", Callable(player, "fire_weapon1"))
+		skill2.connect("trigger_skill", Callable(player, "fire_weapon2"))
+		skill3.connect("trigger_skill", Callable(player, "fire_weapon3"))
 
 
 func end_mission():
@@ -147,16 +148,16 @@ func end_mission():
 
 
 func update_hp(val):
-	$HUDLeft/BarHP.value = val
+	$UI/HUD/Content/Hull/BarHP.value = val
 
 
 func update_shield(val):
-	$HUDLeft/BarShield.value = val
+	$UI/HUD/Content/Shield/BarShield.value = val
 
 
 func update_score(val):
 	score += val
-	$HUDLeft/Score.text = "SCORE:%d" % score
+	$UI/HUD/Content/Payout.text = "PAYOUT: %d CR" % score
 
 
 func game_over():
@@ -195,10 +196,10 @@ func _on_SpawnTimer_timeout():
 			print("Boss time!")
 			$AnimationPlayer.play("RESET")
 			var boss_inst
-			boss_inst = active_mission.boss.instance()
+			boss_inst = active_mission.boss.instantiate()
 			add_child(boss_inst)
-			boss_inst.connect("enemy_dead", self, "update_score")
-			boss_inst.connect("boss_dead", self, "end_mission")
+			boss_inst.connect("enemy_dead", Callable(self, "update_score"))
+			boss_inst.connect("boss_dead", Callable(self, "end_mission"))
 			boss_inst.global_position.x = 0.5 * screen_size.x
 			boss_inst.global_position.y = 0.2 * screen_size.y
 			boss_inst.move_pattern.set_script(load("res://data/MoveFigureEight.gd"))
@@ -209,19 +210,20 @@ func _on_SpawnTimer_timeout():
 		var this_wave = active_mission.waves[wave_count]
 		for i in this_wave.size:
 			for pos in this_wave.spawn.pattern:
-				var enemy_inst = enemy_obj.instance()
+				var enemy_inst = enemy_obj.instantiate()
 				add_child(enemy_inst)
-				enemy_inst.connect("enemy_dead", self, "update_score")
-				enemy_inst.global_position.x = pos.position.x * screen_size.x
-				enemy_inst.global_position.y = pos.position.y * screen_size.y
+				enemy_inst.connect("enemy_dead", Callable(self, "update_score"))
+				enemy_inst.global_position.x = (pos.position.x * PLAY_AREA.size.x)
+				enemy_inst.global_position.y = (pos.position.y * PLAY_AREA.size.y)
+				enemy_inst.global_position += PLAY_AREA.position
 				enemy_inst.move_pattern.set_script(load("res://data/%s.gd" % pos.move))
 				enemy_inst.move_pattern.speed = pos.speed
 				enemy_inst.move_pattern.time_scale = pos.time_scale
 				enemy_inst.move_pattern.flip_h = pos.flip_h
-				yield(get_tree().create_timer(pos.delay), "timeout")
+				await get_tree().create_timer(pos.delay).timeout
 				if state != GameState.PLAY:
 					return
-			yield(get_tree().create_timer(this_wave.spawn.repeat_delay), "timeout")
+			await get_tree().create_timer(this_wave.spawn.repeat_delay).timeout
 			if state != GameState.PLAY:
 				return
 		wave_count += 1
@@ -241,8 +243,3 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 			$AnimationPlayer.play("RESET")
 			self.state = GameState.CHOICE
 
-
-func _on_MissionChoice_mission_choice(num):
-	active_mission = next_missions[num]
-	$MissionChoice.hide()
-	self.state = GameState.INTRO
