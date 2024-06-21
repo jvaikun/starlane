@@ -1,23 +1,22 @@
-extends Control
+extends Button
 
-enum SelfState {INACTIVE, ACTIVE, SELECTED}
+enum SelfState {INACTIVE, ACTIVE, SELECTED, LOCKED}
 
-const INFO_TEXT = "Type: %s\nWaves: %d\nHazards: %s"
-const OFFSET = Vector2.ONE * 16
-
-@onready var button = $Button
-@onready var lines = $Lines
+const INFO_TEXT = "Type: %s\nHazards: %s"
 
 var state = SelfState.INACTIVE : set = set_state
 
 # Link list item: {node, line}
-var link_list : Array = []
-var type : String = "Assault"
-var waves : int = 3
-var hazards : Array = ["Asteroids", "Bombardment"]
+var type : String = "assault"
+var desc : String = "Assault"
+var hazards : Array = ["None"]
 var coords : Vector2 = Vector2.ZERO
+var lines : Array = []
+var node_next : Array = []
+var node_prev : Array = []
 
 signal node_hovered(info_text)
+signal node_clicked(this_node)
 
 
 func set_state(val):
@@ -25,59 +24,72 @@ func set_state(val):
 	match state:
 		SelfState.INACTIVE:
 			modulate = Color.DIM_GRAY
+			disabled = true
 		SelfState.ACTIVE:
 			modulate = Color.WHITE
+			disabled = false
+			for next in node_next:
+				next.state = SelfState.INACTIVE
+			for line in lines:
+				line.line.default_color = Color.WHITE
+				line.line.width = 2.0
+			for prev in node_prev:
+				if prev.state == SelfState.LOCKED:
+					prev.state = SelfState.SELECTED
 		SelfState.SELECTED:
 			modulate = Color.DODGER_BLUE
-			highlight(true)
+			disabled = false
+			for next in node_next:
+				next.state = SelfState.ACTIVE
+			for line in lines:
+				line.line.width = 3.0
+				line.line.default_color = Color.CYAN
+			for prev in node_prev:
+				if prev.state == SelfState.SELECTED:
+					prev.state = SelfState.LOCKED
+		SelfState.LOCKED:
+			disabled = true
+			for next in node_next:
+				if next.state == SelfState.SELECTED:
+					for line in lines:
+						if line.node == next:
+							line.line.default_color = Color.BLUE
+						else:
+							line.line.default_color = Color.WHITE
+							line.line.width = 2.0
+				else:
+					next.state = SelfState.INACTIVE
 
 
-func add_node(new_node):
-	for link in link_list:
-		if new_node == link.node:
+func add_next(node):
+	for next in node_next:
+		if node == next:
 			return
-	var new_line = Line2D.new()
-	lines.add_child(new_line)
-	link_list.append({"node":new_node, "line":new_line})
-	new_line.default_color = Color.WHITE
-	new_line.width = 2.0
-	new_line.clear_points()
-	new_line.add_point(OFFSET)
-	new_line.add_point(new_node.global_position - global_position + OFFSET)
+	node_next.append(node)
+
+
+func add_prev(node):
+	for prev in node_prev:
+		if node == prev:
+			return
+	node_prev.append(node)
 
 
 func clear_nodes():
 	set_state(SelfState.INACTIVE)
-	for line in lines.get_children():
-		line.free()
-	link_list.clear()
-
-
-func highlight(toggle):
-	for link in link_list:
-		if toggle:
-			if link.node.clicked:
-				link.line.default_color = Color.BLUE
-				link.line.width = 3.0
-		elif (state == SelfState.SELECTED) and (link.node.state == SelfState.SELECTED):
-			link.line.default_color = Color.BLUE
-			link.line.width = 3.0
-		else:
-			link.line.default_color = Color.WHITE
-			link.line.width = 2.0
+	lines.clear()
+	node_next.clear()
+	node_prev.clear()
 
 
 func _on_mouse_entered():
-	node_hovered.emit(INFO_TEXT % [type, waves, ", ".join(hazards)])
-	if (state == SelfState.ACTIVE):
-		highlight(true)
+	node_hovered.emit(INFO_TEXT % [type, ", ".join(hazards)])
 
 
-func _on_mouse_exited():
-	highlight(false)
-
-
-func _on_button_pressed():
-	#print("Links: " + str(next_nodes))
-	set_state(SelfState.SELECTED)
+func _on_pressed():
+	if button_pressed:
+		set_state(SelfState.SELECTED)
+	else:
+		set_state(SelfState.ACTIVE)
+	node_clicked.emit(self)
 

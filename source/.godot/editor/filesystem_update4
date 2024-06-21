@@ -1,8 +1,0 @@
-res://default_env.tres
-res://game.tscn
-res://ui/map_node_select.stylebox
-res://player/teleport.gdshader
-res://map/map_node.gd
-res://map/star_map.gd
-res://map/star_map.tscn
-res://map/map_node.tscn

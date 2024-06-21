@@ -1,0 +1,186 @@
+[gd_scene load_steps=18 format=3 uid="uid://bwagfreaxaggi"]
+
+[ext_resource type="Script" path="res://test/test_scene.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://f3v631cpq70r" path="res://player/player.tscn" id="2_2ds0b"]
+[ext_resource type="PackedScene" uid="uid://cal5b78dmh2ts" path="res://test/enemy_boss1.tscn" id="2_rnel1"]
+[ext_resource type="Texture2D" uid="uid://k5yvohgmxacm" path="res://ui/background/512blue01.png" id="3"]
+[ext_resource type="Environment" path="res://effects/env_glow.tres" id="4"]
+[ext_resource type="FontFile" uid="uid://d33k0h6vwcvfv" path="res://ui/fonts/Kenney Pixel.ttf" id="4_ufgk5"]
+[ext_resource type="Texture2D" uid="uid://cyllwctvcap56" path="res://ui/bars/hp_off.png" id="5_bn4x4"]
+[ext_resource type="Texture2D" uid="uid://djxewul5gjqyo" path="res://ui/bars/hp_on.png" id="6_8ci0m"]
+[ext_resource type="Texture2D" uid="uid://c8jc53bfeos3e" path="res://ui/bars/shield_off.png" id="7_hm6kf"]
+[ext_resource type="Texture2D" uid="uid://n5jlmes6ayqm" path="res://ui/bars/shield_on.png" id="8_4udso"]
+[ext_resource type="PackedScene" uid="uid://rksgnk4xyy3i" path="res://ui/skill_button.tscn" id="9_eenci"]
+[ext_resource type="Texture2D" uid="uid://dodl322oapg6q" path="res://ui/icons/beam_wake.png" id="10_mgcr7"]
+[ext_resource type="Texture2D" uid="uid://cxelifpthfi5t" path="res://ui/icons/missile_pod.png" id="11_55rl5"]
+[ext_resource type="Texture2D" uid="uid://y3pee7di0he2" path="res://ui/icons/spiky_field.png" id="12_ql0xv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vfo3j"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.3, 0.3, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 1
+
+[sub_resource type="Gradient" id="Gradient_r0vkn"]
+colors = PackedColorArray(0, 0, 0.2, 1, 0, 0, 0.8, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_qvfx7"]
+gradient = SubResource("Gradient_r0vkn")
+height = 96
+fill_from = Vector2(1, 1)
+fill_to = Vector2(0, 0)
+metadata/_snap_enabled = true
+
+[node name="TestScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Player" parent="." instance=ExtResource("2_2ds0b")]
+position = Vector2(487, 662)
+
+[node name="EnemyBoss1" parent="." instance=ExtResource("2_rnel1")]
+position = Vector2(492, 102)
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 0.1
+
+[node name="BGMPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_mirroring = Vector2(0, 512)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+texture_repeat = 2
+texture = ExtResource("3")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1280, 720)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" type="PanelContainer" parent="UI"]
+texture_filter = 1
+custom_minimum_size = Vector2(360, 720)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -360.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vfo3j")
+
+[node name="Content" type="VBoxContainer" parent="UI/HUD"]
+modulate = Color(0.9, 0.9, 0.9, 1)
+layout_mode = 2
+
+[node name="Map" type="TextureRect" parent="UI/HUD/Content"]
+custom_minimum_size = Vector2(0, 256)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_qvfx7")
+
+[node name="Header" type="Label" parent="UI/HUD/Content"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ufgk5")
+theme_override_font_sizes/font_size = 32
+text = "ROUTE"
+horizontal_alignment = 1
+
+[node name="Payout" type="Label" parent="UI/HUD/Content"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ufgk5")
+theme_override_font_sizes/font_size = 32
+text = "PAYOUT:"
+
+[node name="LblShip" type="Label" parent="UI/HUD/Content"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ufgk5")
+theme_override_font_sizes/font_size = 32
+text = "SHIP"
+horizontal_alignment = 1
+
+[node name="Hull" type="HBoxContainer" parent="UI/HUD/Content"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/HUD/Content/Hull"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ufgk5")
+theme_override_font_sizes/font_size = 32
+text = "HULL"
+
+[node name="BarHP" type="TextureProgressBar" parent="UI/HUD/Content/Hull"]
+layout_mode = 2
+max_value = 5.0
+value = 5.0
+texture_under = ExtResource("5_bn4x4")
+texture_progress = ExtResource("6_8ci0m")
+
+[node name="Shield" type="HBoxContainer" parent="UI/HUD/Content"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/HUD/Content/Shield"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ufgk5")
+theme_override_font_sizes/font_size = 32
+text = "SHIELD"
+
+[node name="BarShield" type="TextureProgressBar" parent="UI/HUD/Content/Shield"]
+layout_mode = 2
+max_value = 5.0
+value = 5.0
+texture_under = ExtResource("7_hm6kf")
+texture_progress = ExtResource("8_4udso")
+
+[node name="LblEquip" type="Label" parent="UI/HUD/Content"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ufgk5")
+theme_override_font_sizes/font_size = 32
+text = "EQUIPMENT"
+horizontal_alignment = 1
+
+[node name="Equip" type="HBoxContainer" parent="UI/HUD/Content"]
+modulate = Color(0.9, 0.9, 0.9, 1)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="SkillButton" parent="UI/HUD/Content/Equip" instance=ExtResource("9_eenci")]
+layout_mode = 2
+texture_normal = ExtResource("10_mgcr7")
+cooldown_time = 10.0
+
+[node name="SkillButton2" parent="UI/HUD/Content/Equip" instance=ExtResource("9_eenci")]
+layout_mode = 2
+texture_normal = ExtResource("11_55rl5")
+cooldown_time = 10.0
+hotkey = "X"
+
+[node name="SkillButton3" parent="UI/HUD/Content/Equip" instance=ExtResource("9_eenci")]
+layout_mode = 2
+texture_normal = ExtResource("12_ql0xv")
+cooldown_time = 10.0
+hotkey = "C"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("4")
+
+[connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

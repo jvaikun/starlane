@@ -1,5 +1,8 @@
 extends Control
 
+const MAP_POS = Vector2(128,160)
+const MAP_SPACING = 64
+const OFFSET = Vector2.ONE * 16
 const MAPS = ["starfield1", "starfield2", "nebula1", "nebula2"]
 const HAZARDS = {
 	"asteroid":"Asteroid Field",
@@ -7,71 +10,80 @@ const HAZARDS = {
 	"mines":"Minefield",
 }
 const NODE_TYPES = {
-	"battle":{"icon":"res://map/textures/icon_battle.png"},
-	"rush":{"icon":"res://map/textures/icon_rush.png"},
-	"salvage":{"icon":"res://map/textures/icon_salvage.png"},
-	"station":{"icon":"res://map/textures/icon_station.png"},
-	"trader":{"icon":"res://map/textures/icon_trader.png"},
+	"assault":{"icon":"res://map/textures/icon_battle.png", "desc":"Assault"},
+	"rush":{"icon":"res://map/textures/icon_rush.png", "desc":"Blitz"},
+	"salvage":{"icon":"res://map/textures/icon_salvage.png", "desc":"Salvage"},
+	"station":{"icon":"res://map/textures/icon_station.png", "desc":"Station"},
 }
 const map_node_obj = preload("res://map/map_node.tscn")
+const PATH_COUNT = 4
 const ROW_SIZE = 6
-const COL_SIZE = 10
+const COL_SIZE = 8
 
-var mission_gen = MissionGen.new()
-var mission_info : String = ""
-var mission_data : Mission
+@onready var wave_labels = $Route/Content/Waves.get_children()
+@onready var wave_info = $Route/Content/WaveInfo
 
-var current_row = 0
 var graph_data : Array = []
 var path_data : Array = []
 var active_nodes : Array = []
 var selected_nodes : Array = []
 
+signal mission_confirmed
+
 
 func _ready():
-	# Generate graph
+	# Prep labels
+	wave_info.text = ""
+	for label in wave_labels:
+		label.text = "No wave selected"
+	# Generate grid
 	for i in COL_SIZE:
 		var graph_row = []
 		for j in ROW_SIZE:
 			var map_node_inst = map_node_obj.instantiate()
 			add_child(map_node_inst)
+			map_node_inst.state = map_node_inst.SelfState.INACTIVE
 			map_node_inst.node_hovered.connect(update_info)
-			map_node_inst.position.x = 128 + (j * 64)
-			map_node_inst.position.y = size.y - 96 - (i * 64)
+			map_node_inst.node_clicked.connect(_on_node_clicked)
+			map_node_inst.position.x = MAP_POS.x + (j * MAP_SPACING)
+			map_node_inst.position.y = size.y - MAP_POS.y - (i * MAP_SPACING)
 			map_node_inst.coords = Vector2(j, i)
 			graph_row.append(map_node_inst)
 		graph_data.append(graph_row)
 
 
 func reset_map():
-	current_row = 0
+	wave_info.text = ""
+	for label in wave_labels:
+		label.text = "No wave selected"
 	path_data.clear()
 	for node in active_nodes:
 		node.clear_nodes()
+	for line in $Lines.get_children():
+		line.queue_free()
 	active_nodes.clear()
 
 
+# TODO: Cleaner, more efficient graph generation?
 func gen_paths():
 	reset_map()
 	# Pick starting points for paths
-	var pick_rand = []
-	for i in ROW_SIZE:
-		pick_rand.append(i)
+	var start_pool = []
 	var start_points = []
-	pick_rand.shuffle()
-	start_points.append(pick_rand[0])
-	start_points.append(pick_rand[1])
-	pick_rand.shuffle()
-	for i in ROW_SIZE-2:
-		start_points.append(pick_rand[i])
+	for i in ROW_SIZE:
+		start_pool.append(i)
+	start_pool.shuffle()
+	start_pool.resize(ROW_SIZE / 2)
+	for i in PATH_COUNT:
+		start_points.append(start_pool.pick_random())
 	# Generate paths
 	var pool = []
 	var prev_col = 0
-	for i in start_points:
+	for point in start_points:
 		var path = []
 		for j in COL_SIZE:
 			if path.is_empty():
-				path.append(start_points[i])
+				path.append(point)
 			else:
 				pool.clear()
 				prev_col = path.back()
@@ -86,14 +98,29 @@ func gen_paths():
 						pool.erase(other_path[j-1])
 				path.append(pool.pick_random())
 		path_data.append(path)
-	# Create lines for paths by linking nodes
+	# Link up nodes in paths
 	for i in path_data.size():
 		for j in path_data[i].size():
 			var this_node = graph_data[j][path_data[i][j]]
-			if j != 0:
-				this_node.add_node(graph_data[j-1][path_data[i][j-1]])
-				pass
+			if j == 0:
+				this_node.add_next(graph_data[j+1][path_data[i][j+1]])
+			elif j == path_data[i].size()-1:
+				this_node.add_prev(graph_data[j-1][path_data[i][j-1]])
+			else:
+				this_node.add_next(graph_data[j+1][path_data[i][j+1]])
+				this_node.add_prev(graph_data[j-1][path_data[i][j-1]])
 			active_nodes.append(this_node)
+	# Build lines for paths
+	for node in active_nodes:
+		for next in node.node_next:
+			var new_line = Line2D.new()
+			$Lines.add_child(new_line)
+			new_line.clear_points()
+			new_line.add_point(node.global_position + OFFSET)
+			new_line.add_point(next.global_position + OFFSET)
+			new_line.width = 2.0
+			new_line.default_color = Color.WHITE
+			node.lines.append({"line":new_line, "node":next})
 	# Assign level types to nodes and hide unused nodes
 	# Types: Battle, Rush, Scavenging, Trader, Station
 	for i in COL_SIZE:
@@ -101,19 +128,34 @@ func gen_paths():
 			if !(graph_data[i][j] in active_nodes):
 				graph_data[i][j].hide()
 			else:
-				var type = "station"
-				if i != COL_SIZE-1:
-					type = NODE_TYPES.keys().pick_random()
-				graph_data[i][j].button.icon = load(NODE_TYPES[type].icon)
-				graph_data[i][j].waves = 3 + randi() % 4
+				var type = NODE_TYPES.keys().pick_random()
+				graph_data[i][j].type = type
+				graph_data[i][j].desc = NODE_TYPES[type].desc
+				graph_data[i][j].icon = load(NODE_TYPES[type].icon)
 				graph_data[i][j].show()
-	for node in graph_data[current_row]:
-		print(node.waves)
+	for node in graph_data[0]:
 		node.state = node.SelfState.ACTIVE
 
 
 func update_info(info_text):
-	mission_info = info_text
+	wave_info.text = info_text
+
+
+func _on_node_clicked(node):
+	var node_row = node.coords.y
+	if node.state == node.SelfState.SELECTED:
+		selected_nodes.append(node)
+		wave_labels[node_row].text = "Wave %d: %s" % [node_row+1, node.type]
+		if node in graph_data[0]:
+			for start_point in graph_data[0]:
+				if start_point != node:
+					start_point.state = start_point.SelfState.INACTIVE
+	else:
+		selected_nodes.erase(node)
+		wave_labels[node_row].text = "No wave selected"
+		if node in graph_data[0]:
+			for start_point in graph_data[0]:
+				start_point.state = start_point.SelfState.ACTIVE
 
 
 func _on_btn_reroll_pressed():
@@ -121,14 +163,14 @@ func _on_btn_reroll_pressed():
 
 
 func _on_btn_run_pressed():
-	var phases = []
-	for node in active_nodes:
-		if node.clicked:
-			phases.append({
+	GameData.mission_info.clear()
+	for node in selected_nodes:
+		if node.state == node.SelfState.LOCKED or node.state == node.SelfState.SELECTED:
+			GameData.mission_info.append({
 				"type":node.type,
-				"waves":node.waves,
 				"hazards":node.hazards,
 				"coords":node.coords,
 			})
-	mission_data = mission_gen.generate_mission(phases)
+	GameData.build_mission()
+	mission_confirmed.emit()
 

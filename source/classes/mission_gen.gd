@@ -57,7 +57,7 @@ const double_sine = {
 	"pattern":[
 		{
 			"position": Vector2(0.1, 0),
-			"move": "MoveSine",
+			"move": "move_sine",
 			"speed": 150,
 			"time_scale": TAU,
 			"flip_h": false,
@@ -65,7 +65,7 @@ const double_sine = {
 		},
 		{
 			"position": Vector2(0.9, 0),
-			"move": "MoveSine",
+			"move": "move_sine",
 			"speed": 150,
 			"time_scale": TAU,
 			"flip_h": true,
@@ -80,7 +80,7 @@ const double_zigzag = {
 	"pattern":[
 		{
 			"position": Vector2(0.4, 0),
-			"move": "MoveZigZag",
+			"move": "move_zigzag",
 			"speed": 300,
 			"time_scale": 2,
 			"flip_h": false,
@@ -88,7 +88,7 @@ const double_zigzag = {
 		},
 		{
 			"position": Vector2(0.6, 0),
-			"move": "MoveZigZag",
+			"move": "move_zigzag",
 			"speed": 300,
 			"time_scale": 2,
 			"flip_h": true,
@@ -103,7 +103,7 @@ const double_swoop = {
 	"pattern":[
 		{
 			"position": Vector2(0.2, 0),
-			"move": "MoveDive",
+			"move": "move_dive",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": true,
@@ -111,7 +111,7 @@ const double_swoop = {
 		},
 		{
 			"position": Vector2(0.8, 0),
-			"move": "MoveDive",
+			"move": "move_dive",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -126,7 +126,7 @@ const wedge = {
 	"pattern":[
 		{
 			"position": Vector2(0.5, 0),
-			"move": "MoveDown",
+			"move": "move_down",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -134,7 +134,7 @@ const wedge = {
 		},
 		{
 			"position": Vector2(0.4, 0),
-			"move": "MoveDown",
+			"move": "move_down",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -142,7 +142,7 @@ const wedge = {
 		},
 		{
 			"position": Vector2(0.6, 0),
-			"move": "MoveDown",
+			"move": "move_down",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -150,7 +150,7 @@ const wedge = {
 		},
 		{
 			"position": Vector2(0.3, 0),
-			"move": "MoveDown",
+			"move": "move_down",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -158,7 +158,7 @@ const wedge = {
 		},
 		{
 			"position": Vector2(0.7, 0),
-			"move": "MoveDown",
+			"move": "move_down",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -173,7 +173,7 @@ const wedge_swoop = {
 	"pattern":[
 		{
 			"position": Vector2(0.5, 0),
-			"move": "MoveDown",
+			"move": "move_down",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -181,7 +181,7 @@ const wedge_swoop = {
 		},
 		{
 			"position": Vector2(0.4, 0),
-			"move": "MoveDive",
+			"move": "move_dive",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": true,
@@ -189,7 +189,7 @@ const wedge_swoop = {
 		},
 		{
 			"position": Vector2(0.6, 0),
-			"move": "MoveDive",
+			"move": "move_dive",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -197,7 +197,7 @@ const wedge_swoop = {
 		},
 		{
 			"position": Vector2(0.3, 0),
-			"move": "MoveDive",
+			"move": "move_dive",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": false,
@@ -205,7 +205,7 @@ const wedge_swoop = {
 		},
 		{
 			"position": Vector2(0.7, 0),
-			"move": "MoveDive",
+			"move": "move_dive",
 			"speed": 150,
 			"time_scale": 2,
 			"flip_h": true,
@@ -227,24 +227,23 @@ const BOSSES = [preload("res://bosses/enemy_boss.tscn")]
 
 
 func generate_name():
-	return FIRST_NAMES[randi() % FIRST_NAMES.size()] + " " + LAST_NAMES[randi() % LAST_NAMES.size()]
+	return FIRST_NAMES.pick_random() + " " + LAST_NAMES.pick_random()
 
 
-func generate_mission(phase_list):
+func generate_mission(wave_list):
 	var new_mission = Mission.new()
 	new_mission.name = generate_name()
-	for phase in phase_list:
-		new_mission.map_points.append(phase.coords)
-		for i in phase.waves:
-			var my_wave = SPAWNS[randi() % SPAWNS.size()]
-			var my_size = 1
-			if (my_wave.repeat_range[1] - my_wave.repeat_range[0]) > 0:
-				my_size = (randi() % (my_wave.repeat_range[1] - my_wave.repeat_range[0])) + my_wave.repeat_range[0]
-			new_mission.waves.append({
-				"size": my_size,
-				"spawn": my_wave, 
-				"next": 1 + randi() % 2
-			})
+	for wave in wave_list:
+		new_mission.map_points.append(wave.coords)
+		var my_wave = SPAWNS.pick_random()
+		var my_size = 1
+		if my_wave.repeat_range[1] > my_wave.repeat_range[0]:
+			my_size = randi_range(my_wave.repeat_range[0], my_wave.repeat_range[1])
+		new_mission.waves.append({
+			"size": my_size,
+			"spawn": my_wave, 
+			"next": 1 + randi() % 2
+		})
 	new_mission.boss = BOSSES[0]
 	return new_mission
 
