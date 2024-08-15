@@ -22,8 +22,8 @@ var dir_vector = Vector2.ZERO
 var wave_count = 0
 var boss_spawned = false
 var is_scrolling = false
-var screen_size = Vector2.ZERO
-var time_count = 0.0
+#var screen_size = Vector2.ZERO
+
 
 func set_state(value):
 	if value in GameState.values():
@@ -67,7 +67,6 @@ func set_state(value):
 			GameState.OUTRO:
 				level_index += 1
 				boss_spawned = false
-				time_count = 0.0
 				wave_count = 0
 				player.warp_out()
 				$AnimationPlayer.play("outro_in")
@@ -97,8 +96,8 @@ func _process(delta):
 				dir_vector.x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 				dir_vector.y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
 				player.translate(dir_vector.normalized() * 4)
-				player.position.x = clamp(player.position.x, 0, screen_size.x)
-				player.position.y = clamp(player.position.y, 0, screen_size.y)
+				player.position.x = clamp(player.position.x, 0, PLAY_AREA.size.x)
+				player.position.y = clamp(player.position.y, 0, PLAY_AREA.size.y)
 			if Input.is_action_just_pressed("ui_weapon1"):
 				skill1.fire_skill()
 			if Input.is_action_just_pressed("ui_weapon2"):
@@ -108,7 +107,6 @@ func _process(delta):
 
 
 func init_game():
-	screen_size = get_viewport_rect().size
 	score = 0
 	update_score(0)
 	update_hp(5)
@@ -129,7 +127,7 @@ func spawn_player():
 	if !is_instance_valid(player):
 		player = player_obj.instantiate()
 		add_child(player)
-		player.global_position = screen_size * HOME_POS
+		player.global_position = PLAY_AREA.size * HOME_POS
 		player.connect("player_dead", Callable(self, "game_over"))
 		player.connect("hp_change", Callable(self, "update_hp"))
 		player.connect("shield_change", Callable(self, "update_shield"))
@@ -206,7 +204,8 @@ func _on_SpawnTimer_timeout():
 			boss_spawned = true
 			$SpawnTimer.stop()
 	else:
-		print("Time: %d, Enemy wave: %d" % [time_count, wave_count])
+		$UI/HUD/Content/Map/Marker.position = $UI/HUD/Content/Map/Route.get_point_position(wave_count)
+		print("Enemy wave: %d" % wave_count)
 		var this_wave = GameData.mission_data.waves[wave_count]
 		for i in this_wave.size:
 			for pos in this_wave.spawn.pattern:
@@ -245,15 +244,17 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 
 
 func _on_mission_confirmed():
-	var route_line = Line2D.new()
-	$UI/HUD/Content/Map.add_child(route_line)
-	route_line.clear_points()
-	for point in GameData.mission_info:
-		var lbl_inst = Label.new()
-		$UI/HUD/Content/Map.add_child(lbl_inst)
+	$ParallaxBackground/ParallaxLayer/Sprite2D.texture = load(GameData.mission_data.background)
+	$UI/HUD/Content/Map/Route.clear_points()
+	for sprite in $UI/HUD/Content/Map/Points.get_children():
+		sprite.queue_free()
+	for point in GameData.mission_waves:
 		var map_coords = Vector2(point.coords.x * 32, 256 - point.coords.y * 32)
-		lbl_inst.text = "X"
-		lbl_inst.position = map_coords
-		route_line.add_point(map_coords)
+		var spr_point = Sprite2D.new()
+		$UI/HUD/Content/Map/Points.add_child(spr_point)
+		spr_point.texture = load("res://map/textures/icon_battle.png")
+		spr_point.position = map_coords
+		$UI/HUD/Content/Map/Route.add_point(map_coords)
+	$UI/HUD/Content/Map/Marker.position = $UI/HUD/Content/Map/Route.get_point_position(0)
 	set_state(GameState.INTRO)
 

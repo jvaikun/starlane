@@ -107,6 +107,13 @@ offset_top = -68.0
 grow_horizontal = 0
 grow_vertical = 0
 
+[node name="BtnEquip" type="Button" parent="Buttons"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_y8odc")
+theme_override_font_sizes/font_size = 32
+text = "Upgrade Ship
+"
+
 [node name="BtnReroll" type="Button" parent="Buttons"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_y8odc")
@@ -146,5 +153,7 @@ theme_override_fonts/font = ExtResource("2_y8odc")
 theme_override_font_sizes/font_size = 48
 text = "Route Start"
 
+[connection signal="pressed" from="Buttons/BtnEquip" to="." method="_on_btn_equip_pressed"]
 [connection signal="pressed" from="Buttons/BtnReroll" to="." method="_on_btn_reroll_pressed"]
 [connection signal="pressed" from="Buttons/BtnRun" to="." method="_on_btn_run_pressed"]
+[connection signal="pressed" from="Buttons/BtnQuit" to="." method="_on_btn_quit_pressed"]

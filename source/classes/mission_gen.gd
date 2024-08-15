@@ -53,6 +53,11 @@ const LAST_NAMES = ["Abyss","Agony","Anvil","Arm","Armpit","Avalanche","Axe","Ba
 "Vault","View","Void","Walk","Wasteland","Wealth","Well","Wilderness","Womb",
 "Wrath","Wreck"]
 
+const BACKGROUNDS = ["res://ui/background/512blue01.png", "res://ui/background/512blue02.png", 
+"res://ui/background/512blue03.png", "res://ui/background/512blue04.png", 
+"res://ui/background/512blue05.png", "res://ui/background/512blue06.png", 
+"res://ui/background/512blue07.png", "res://ui/background/512blue08.png"]
+
 const double_sine = {
 	"pattern":[
 		{
@@ -233,12 +238,12 @@ func generate_name():
 func generate_mission(wave_list):
 	var new_mission = Mission.new()
 	new_mission.name = generate_name()
+	new_mission.background = BACKGROUNDS.pick_random()
 	for wave in wave_list:
 		new_mission.map_points.append(wave.coords)
 		var my_wave = SPAWNS.pick_random()
 		var my_size = 1
-		if my_wave.repeat_range[1] > my_wave.repeat_range[0]:
-			my_size = randi_range(my_wave.repeat_range[0], my_wave.repeat_range[1])
+		my_size = randi_range(my_wave.repeat_range[0], my_wave.repeat_range[1])
 		new_mission.waves.append({
 			"size": my_size,
 			"spawn": my_wave, 

@@ -163,14 +163,22 @@ func _on_btn_reroll_pressed():
 
 
 func _on_btn_run_pressed():
-	GameData.mission_info.clear()
+	GameData.mission_waves.clear()
 	for node in selected_nodes:
 		if node.state == node.SelfState.LOCKED or node.state == node.SelfState.SELECTED:
-			GameData.mission_info.append({
+			GameData.mission_waves.append({
 				"type":node.type,
 				"hazards":node.hazards,
 				"coords":node.coords,
 			})
 	GameData.build_mission()
 	mission_confirmed.emit()
+
+
+func _on_btn_equip_pressed():
+	pass # Replace with function body.
+
+
+func _on_btn_quit_pressed():
+	pass # Replace with function body.
 

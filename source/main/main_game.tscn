@@ -1,15 +1,19 @@
-[gd_scene load_steps=25 format=3 uid="uid://dvp0bwc25fdph"]
+[gd_scene load_steps=29 format=3 uid="uid://dvp0bwc25fdph"]
 
 [ext_resource type="Script" path="res://main/main_game.gd" id="1_f6uxc"]
 [ext_resource type="Texture2D" uid="uid://k5yvohgmxacm" path="res://ui/background/512blue01.png" id="2_ng35q"]
 [ext_resource type="FontFile" uid="uid://d33k0h6vwcvfv" path="res://ui/fonts/Kenney Pixel.ttf" id="3_h7q7t"]
+[ext_resource type="Texture2D" uid="uid://cjl8aias636r" path="res://map/textures/crosshair.png" id="4_ake4l"]
 [ext_resource type="Texture2D" uid="uid://cyllwctvcap56" path="res://ui/bars/hp_off.png" id="4_lo5tw"]
 [ext_resource type="Texture2D" uid="uid://djxewul5gjqyo" path="res://ui/bars/hp_on.png" id="5_c42ok"]
 [ext_resource type="Texture2D" uid="uid://c8jc53bfeos3e" path="res://ui/bars/shield_off.png" id="6_ne5qc"]
 [ext_resource type="Texture2D" uid="uid://n5jlmes6ayqm" path="res://ui/bars/shield_on.png" id="7_6pu8t"]
+[ext_resource type="Texture2D" uid="uid://b0ypebv786s6x" path="res://ui/bars/bar_bg.png" id="8_21ngp"]
 [ext_resource type="PackedScene" uid="uid://rksgnk4xyy3i" path="res://ui/skill_button.tscn" id="8_ym3ti"]
 [ext_resource type="Texture2D" uid="uid://dodl322oapg6q" path="res://ui/icons/beam_wake.png" id="9_2vqa0"]
+[ext_resource type="Texture2D" uid="uid://dombdvijggkft" path="res://ui/bars/bar_fg.png" id="9_kcvpo"]
 [ext_resource type="Texture2D" uid="uid://cxelifpthfi5t" path="res://ui/icons/missile_pod.png" id="10_32a5w"]
+[ext_resource type="Texture2D" uid="uid://c4camuckntjir" path="res://ui/bars/bar_fill.png" id="10_ss2gi"]
 [ext_resource type="Texture2D" uid="uid://y3pee7di0he2" path="res://ui/icons/spiky_field.png" id="11_bog4h"]
 [ext_resource type="FontFile" uid="uid://d318d5a8yf3rs" path="res://ui/fonts/Kenney Future.ttf" id="12_17y41"]
 [ext_resource type="PackedScene" uid="uid://ssmrmcx8ya76" path="res://map/star_map.tscn" id="13_rcvrq"]
@@ -264,7 +268,7 @@ fill_from = Vector2(1, 1)
 fill_to = Vector2(0, 0)
 metadata/_snap_enabled = true
 
-[node name="Game" type="Control"]
+[node name="MainGame" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -313,28 +317,40 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_v4mg0")
 modulate = Color(0.9, 0.9, 0.9, 1)
 layout_mode = 2
 
+[node name="Header" type="Label" parent="UI/HUD/Content"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_h7q7t")
+theme_override_font_sizes/font_size = 48
+text = "ROUTE"
+horizontal_alignment = 1
+
 [node name="Map" type="TextureRect" parent="UI/HUD/Content"]
 custom_minimum_size = Vector2(0, 256)
 layout_mode = 2
 texture = SubResource("GradientTexture2D_7f2sh")
 
-[node name="Header" type="Label" parent="UI/HUD/Content"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("3_h7q7t")
-theme_override_font_sizes/font_size = 32
-text = "ROUTE"
-horizontal_alignment = 1
+[node name="Route" type="Line2D" parent="UI/HUD/Content/Map"]
+width = 4.0
+default_color = Color(0, 1, 1, 1)
+joint_mode = 1
+begin_cap_mode = 2
+end_cap_mode = 2
+
+[node name="Points" type="Node2D" parent="UI/HUD/Content/Map"]
+
+[node name="Marker" type="Sprite2D" parent="UI/HUD/Content/Map"]
+texture = ExtResource("4_ake4l")
 
 [node name="Payout" type="Label" parent="UI/HUD/Content"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_h7q7t")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 text = "PAYOUT:"
 
 [node name="LblShip" type="Label" parent="UI/HUD/Content"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_h7q7t")
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 text = "SHIP"
 horizontal_alignment = 1
 
@@ -372,10 +388,33 @@ value = 5.0
 texture_under = ExtResource("6_ne5qc")
 texture_progress = ExtResource("7_6pu8t")
 
-[node name="LblEquip" type="Label" parent="UI/HUD/Content"]
+[node name="Cargo" type="HBoxContainer" parent="UI/HUD/Content"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="UI/HUD/Content/Cargo"]
+custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_h7q7t")
 theme_override_font_sizes/font_size = 32
+text = "CARGO"
+
+[node name="BarCargo" type="TextureProgressBar" parent="UI/HUD/Content/Cargo"]
+custom_minimum_size = Vector2(128, 16)
+layout_mode = 2
+value = 50.0
+nine_patch_stretch = true
+stretch_margin_left = 4
+stretch_margin_top = 4
+stretch_margin_right = 4
+stretch_margin_bottom = 4
+texture_under = ExtResource("8_21ngp")
+texture_over = ExtResource("9_kcvpo")
+texture_progress = ExtResource("10_ss2gi")
+
+[node name="LblEquip" type="Label" parent="UI/HUD/Content"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_h7q7t")
+theme_override_font_sizes/font_size = 48
 text = "EQUIPMENT"
 horizontal_alignment = 1
 
