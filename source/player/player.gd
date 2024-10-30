@@ -9,28 +9,31 @@ const MAX_SHIELD = 5.0
 const WEAPON_TIME1 = 2.0
 const WEAPON_TIME2 = 5.0
 const WEAPON_TIME3 = 5.0
+const CARGO_DRAIN_TIME = 0.1
+const CARGO_DRAIN_RATE = 1
 
 var hp = 5: set = set_hp
 var shield = 5: set = set_shield
 var regen_on = false
 var beam_firing = false
 var defense_on = false
+var cargo_value : int = 0
+var grabbed_cargo : Area2D = null
 
-signal player_dead
-signal hp_change
-signal shield_change
+signal player_died
+signal status_changed
 
 
 func set_hp(value):
 	hp = clamp(value, 0, MAX_HP)
 	if hp == 0:
-		emit_signal("player_dead")
+		player_died.emit()
 		var explode_inst = explode_obj.instantiate()
 		get_parent().add_child(explode_inst)
 		explode_inst.global_position = global_position
 		queue_free()
 	else:
-		emit_signal("hp_change", hp)
+		status_changed.emit()
 
 
 func set_shield(value):
@@ -41,7 +44,7 @@ func set_shield(value):
 		shield = clamp(value, 0, MAX_SHIELD)
 	if shield == MAX_SHIELD:
 		regen_on = false
-	emit_signal("shield_change", shield)
+	status_changed.emit()
 
 
 # Called when the node enters the scene tree for the first time.
@@ -152,6 +155,23 @@ func _on_SpecialTimer_timeout():
 	$Radius/Sprite2D.hide()
 
 
+func _on_tractor_area_entered(area):
+	if area.is_in_group("cargo") and !is_instance_valid(grabbed_cargo):
+		area.set_grab(true, self)
+		grabbed_cargo = area
+		$TractorTimer.start(CARGO_DRAIN_TIME)
+
+
+func _on_tractor_timer_timeout():
+	if is_instance_valid(grabbed_cargo):
+		grabbed_cargo.hp -= CARGO_DRAIN_RATE
+		cargo_value += CARGO_DRAIN_RATE * 5
+		status_changed.emit()
+		$TractorTimer.start(CARGO_DRAIN_TIME)
+	else:
+		grabbed_cargo = null
+
+
 func _on_Radius_area_entered(area):
 	if defense_on and area.is_in_group("bullet_enemy"):
 		area.queue_free()
@@ -163,3 +183,4 @@ func _on_Beam_area_entered(area):
 			area.hp -= 100
 		elif area.is_in_group("bullet_enemy"):
 			area.queue_free()
+

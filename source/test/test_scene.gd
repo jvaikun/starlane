@@ -4,8 +4,10 @@ enum GameState {TITLE, CHOICE, INTRO, PLAY, OUTRO, PAUSE, END}
 
 const enemy_obj = preload("res://enemies/enemy_drone.tscn")
 const hazard_obj = preload("res://hazards/asteroid.tscn")
+const cargo_obj = preload("res://items/cargo.tscn")
 const PLAY_AREA = Rect2(0, 0, 920, 720)
 const TITLE_TEXT = "Mission: %d"
+const CARGO_TEXT = "Cargo: %d CR"
 const START_WAIT = 1.0
 const BOSS_WAIT = 2.0
 const HOME_POS = Vector2(0.5, 0.8)
@@ -28,11 +30,10 @@ func _ready():
 	$Player.warp_in()
 	$SpawnTimer.start(1)
 	player.global_position = PLAY_AREA.size * HOME_POS
-	player.connect("hp_change", Callable(self, "update_hp"))
-	player.connect("shield_change", Callable(self, "update_shield"))
-	skill1.connect("trigger_skill", Callable(player, "fire_weapon1"))
-	skill2.connect("trigger_skill", Callable(player, "fire_weapon2"))
-	skill3.connect("trigger_skill", Callable(player, "fire_weapon3"))
+	player.status_changed.connect(update_status)
+	skill1.trigger_skill.connect(player.fire_weapon1)
+	skill2.trigger_skill.connect(player.fire_weapon2)
+	skill3.trigger_skill.connect(player.fire_weapon3)
 
 
 func _process(delta):
@@ -50,6 +51,11 @@ func _process(delta):
 		if Input.is_action_just_pressed("ui_weapon3"):
 			skill3.fire_skill()
 
+
+func update_status():
+	$UI/HUD/Content/Hull/BarHP.value = player.hp
+	$UI/HUD/Content/Shield/BarShield.value = player.shield
+	$UI/HUD/Content/Cargo.text = CARGO_TEXT % player.cargo_value
 
 func spawn_wave():
 	var this_wave = generator.SPAWNS[randi() % generator.SPAWNS.size()]
@@ -74,7 +80,15 @@ func spawn_hazard():
 	hazard_inst.global_position = Vector2(PLAY_AREA.size.x * ((randi() % 10) * 0.1), 16)
 
 
+func spawn_cargo():
+	var cargo_inst = cargo_obj.instantiate()
+	add_child(cargo_inst)
+	cargo_inst.global_position = Vector2(PLAY_AREA.size.x * ((randi() % 10) * 0.1), 16)
+
+
 func _on_spawn_timer_timeout():
-	spawn_hazard()
+	#spawn_cargo()
+	#spawn_hazard()
 	#spawn_wave()
+	pass
 

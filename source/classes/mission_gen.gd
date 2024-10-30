@@ -239,6 +239,14 @@ func generate_mission(wave_list):
 	var new_mission = Mission.new()
 	new_mission.name = generate_name()
 	new_mission.background = BACKGROUNDS.pick_random()
+	# "loot_level" : 1,
+	# "loot_multiplier" : 1,
+	# "loot_value" : 0,
+	# "enemy_level" : 1,
+	# "enemy_multiplier" : 1,
+	# "enemy_amount" : 1,
+	# "hazard_level" : 1,
+	# "hazard_type" : "none",
 	for wave in wave_list:
 		new_mission.map_points.append(wave.coords)
 		var my_wave = SPAWNS.pick_random()

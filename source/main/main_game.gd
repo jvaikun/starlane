@@ -109,8 +109,7 @@ func _process(delta):
 func init_game():
 	score = 0
 	update_score(0)
-	update_hp(5)
-	update_shield(5)
+	#update_status()
 	self.state = GameState.CHOICE
 
 
@@ -128,12 +127,10 @@ func spawn_player():
 		player = player_obj.instantiate()
 		add_child(player)
 		player.global_position = PLAY_AREA.size * HOME_POS
-		player.connect("player_dead", Callable(self, "game_over"))
-		player.connect("hp_change", Callable(self, "update_hp"))
-		player.connect("shield_change", Callable(self, "update_shield"))
-		skill1.connect("trigger_skill", Callable(player, "fire_weapon1"))
-		skill2.connect("trigger_skill", Callable(player, "fire_weapon2"))
-		skill3.connect("trigger_skill", Callable(player, "fire_weapon3"))
+		player.status_changed.connect(update_status)
+		skill1.trigger_skill.connect(player.fire_weapon1)
+		skill2.trigger_skill.connect(player.fire_weapon2)
+		skill3.trigger_skill.connect(player.fire_weapon3)
 
 
 func end_mission():
@@ -141,12 +138,10 @@ func end_mission():
 	self.state = GameState.OUTRO
 
 
-func update_hp(val):
-	$UI/HUD/Content/Hull/BarHP.value = val
-
-
-func update_shield(val):
-	$UI/HUD/Content/Shield/BarShield.value = val
+func update_status():
+	$UI/HUD/Content/Status/BarHP.value = player.hp
+	$UI/HUD/Content/Status/BarShield.value = player.shield
+	$UI/HUD/Content/Status/BarCargo.value = player.cargo_value
 
 
 func update_score(val):
@@ -196,8 +191,8 @@ func _on_SpawnTimer_timeout():
 			var boss_inst
 			boss_inst = GameData.mission_data.boss.instantiate()
 			add_child(boss_inst)
-			boss_inst.connect("enemy_dead", Callable(self, "update_score"))
-			boss_inst.connect("boss_dead", Callable(self, "end_mission"))
+			boss_inst.enemy_dead.connect(update_score)
+			boss_inst.boss_dead.connect(end_mission)
 			boss_inst.global_position.x = 0.5 * PLAY_AREA.size.x
 			boss_inst.global_position.y = 0.2 * PLAY_AREA.size.y
 			boss_inst.move_pattern.set_script(load("res://data/move_fig8.gd"))
@@ -211,7 +206,7 @@ func _on_SpawnTimer_timeout():
 			for pos in this_wave.spawn.pattern:
 				var enemy_inst = enemy_obj.instantiate()
 				add_child(enemy_inst)
-				enemy_inst.connect("enemy_dead", Callable(self, "update_score"))
+				enemy_inst.enemy_dead.connect(update_score)
 				enemy_inst.global_position.x = (pos.position.x * PLAY_AREA.size.x)
 				enemy_inst.global_position.y = (pos.position.y * PLAY_AREA.size.y)
 				enemy_inst.global_position += PLAY_AREA.position

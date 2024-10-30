@@ -1,13 +1,11 @@
-[gd_scene load_steps=29 format=3 uid="uid://dvp0bwc25fdph"]
+[gd_scene load_steps=27 format=3 uid="uid://dvp0bwc25fdph"]
 
 [ext_resource type="Script" path="res://main/main_game.gd" id="1_f6uxc"]
 [ext_resource type="Texture2D" uid="uid://k5yvohgmxacm" path="res://ui/background/512blue01.png" id="2_ng35q"]
 [ext_resource type="FontFile" uid="uid://d33k0h6vwcvfv" path="res://ui/fonts/Kenney Pixel.ttf" id="3_h7q7t"]
 [ext_resource type="Texture2D" uid="uid://cjl8aias636r" path="res://map/textures/crosshair.png" id="4_ake4l"]
-[ext_resource type="Texture2D" uid="uid://cyllwctvcap56" path="res://ui/bars/hp_off.png" id="4_lo5tw"]
-[ext_resource type="Texture2D" uid="uid://djxewul5gjqyo" path="res://ui/bars/hp_on.png" id="5_c42ok"]
-[ext_resource type="Texture2D" uid="uid://c8jc53bfeos3e" path="res://ui/bars/shield_off.png" id="6_ne5qc"]
-[ext_resource type="Texture2D" uid="uid://n5jlmes6ayqm" path="res://ui/bars/shield_on.png" id="7_6pu8t"]
+[ext_resource type="Texture2D" uid="uid://hpswrf5i41g5" path="res://ui/bars/bar_fg2.png" id="6_w6qsf"]
+[ext_resource type="Texture2D" uid="uid://jb4mrn7smhsi" path="res://ui/bars/bar_fill2.png" id="7_s2dvq"]
 [ext_resource type="Texture2D" uid="uid://b0ypebv786s6x" path="res://ui/bars/bar_bg.png" id="8_21ngp"]
 [ext_resource type="PackedScene" uid="uid://rksgnk4xyy3i" path="res://ui/skill_button.tscn" id="8_ym3ti"]
 [ext_resource type="Texture2D" uid="uid://dodl322oapg6q" path="res://ui/icons/beam_wake.png" id="9_2vqa0"]
@@ -354,51 +352,60 @@ theme_override_font_sizes/font_size = 48
 text = "SHIP"
 horizontal_alignment = 1
 
-[node name="Hull" type="HBoxContainer" parent="UI/HUD/Content"]
+[node name="Status" type="GridContainer" parent="UI/HUD/Content"]
 layout_mode = 2
+columns = 2
 
-[node name="Label" type="Label" parent="UI/HUD/Content/Hull"]
+[node name="LHP" type="Label" parent="UI/HUD/Content/Status"]
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_h7q7t")
 theme_override_font_sizes/font_size = 32
 text = "HULL"
 
-[node name="BarHP" type="TextureProgressBar" parent="UI/HUD/Content/Hull"]
+[node name="BarHP" type="TextureProgressBar" parent="UI/HUD/Content/Status"]
+custom_minimum_size = Vector2(192, 0)
 layout_mode = 2
 max_value = 5.0
 value = 5.0
-texture_under = ExtResource("4_lo5tw")
-texture_progress = ExtResource("5_c42ok")
+nine_patch_stretch = true
+stretch_margin_left = 4
+stretch_margin_top = 4
+stretch_margin_right = 4
+stretch_margin_bottom = 4
+texture_under = ExtResource("8_21ngp")
+texture_over = ExtResource("6_w6qsf")
+texture_progress = ExtResource("7_s2dvq")
 
-[node name="Shield" type="HBoxContainer" parent="UI/HUD/Content"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="UI/HUD/Content/Shield"]
+[node name="LShield" type="Label" parent="UI/HUD/Content/Status"]
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_h7q7t")
 theme_override_font_sizes/font_size = 32
 text = "SHIELD"
 
-[node name="BarShield" type="TextureProgressBar" parent="UI/HUD/Content/Shield"]
+[node name="BarShield" type="TextureProgressBar" parent="UI/HUD/Content/Status"]
+custom_minimum_size = Vector2(192, 0)
 layout_mode = 2
 max_value = 5.0
 value = 5.0
-texture_under = ExtResource("6_ne5qc")
-texture_progress = ExtResource("7_6pu8t")
+nine_patch_stretch = true
+stretch_margin_left = 4
+stretch_margin_top = 4
+stretch_margin_right = 4
+stretch_margin_bottom = 4
+texture_under = ExtResource("8_21ngp")
+texture_over = ExtResource("9_kcvpo")
+texture_progress = ExtResource("10_ss2gi")
 
-[node name="Cargo" type="HBoxContainer" parent="UI/HUD/Content"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="UI/HUD/Content/Cargo"]
+[node name="LCargo" type="Label" parent="UI/HUD/Content/Status"]
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_h7q7t")
 theme_override_font_sizes/font_size = 32
 text = "CARGO"
 
-[node name="BarCargo" type="TextureProgressBar" parent="UI/HUD/Content/Cargo"]
+[node name="BarCargo" type="TextureProgressBar" parent="UI/HUD/Content/Status"]
 custom_minimum_size = Vector2(128, 16)
 layout_mode = 2
 value = 50.0

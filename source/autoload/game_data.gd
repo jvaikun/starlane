@@ -1,7 +1,7 @@
 extends Node
 
 var mission_gen = MissionGen.new()
-var mission_waves : Array[Dictionary]
+var mission_waves : Array
 var mission_data : Mission
 
 

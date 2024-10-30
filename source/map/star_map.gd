@@ -3,7 +3,6 @@ extends Control
 const MAP_POS = Vector2(128,160)
 const MAP_SPACING = 64
 const OFFSET = Vector2.ONE * 16
-const MAPS = ["starfield1", "starfield2", "nebula1", "nebula2"]
 const HAZARDS = {
 	"asteroid":"Asteroid Field",
 	"meteor":"Meteor Shower",
@@ -43,6 +42,7 @@ func _ready():
 			var map_node_inst = map_node_obj.instantiate()
 			add_child(map_node_inst)
 			map_node_inst.state = map_node_inst.SelfState.INACTIVE
+			map_node_inst.id = "_".join([str(j), str(i)])
 			map_node_inst.node_hovered.connect(update_info)
 			map_node_inst.node_clicked.connect(_on_node_clicked)
 			map_node_inst.position.x = MAP_POS.x + (j * MAP_SPACING)
@@ -68,13 +68,10 @@ func reset_map():
 func gen_paths():
 	reset_map()
 	# Pick starting points for paths
-	var start_pool = []
-	var start_points = []
-	for i in ROW_SIZE:
-		start_pool.append(i)
+	var start_pool = range(ROW_SIZE)
 	start_pool.shuffle()
-	start_pool.resize(ROW_SIZE / 2)
-	for i in PATH_COUNT:
+	var start_points = start_pool.slice(0, ROW_SIZE/2)
+	for i in PATH_COUNT - start_points.size():
 		start_points.append(start_pool.pick_random())
 	# Generate paths
 	var pool = []
@@ -127,6 +124,7 @@ func gen_paths():
 		for j in ROW_SIZE:
 			if !(graph_data[i][j] in active_nodes):
 				graph_data[i][j].hide()
+				pass
 			else:
 				var type = NODE_TYPES.keys().pick_random()
 				graph_data[i][j].type = type
@@ -145,7 +143,7 @@ func _on_node_clicked(node):
 	var node_row = node.coords.y
 	if node.state == node.SelfState.SELECTED:
 		selected_nodes.append(node)
-		wave_labels[node_row].text = "Wave %d: %s" % [node_row+1, node.type]
+		wave_labels[node_row].text = "Wave %d: %s, %s" % [node_row+1, node.type, node.id]
 		if node in graph_data[0]:
 			for start_point in graph_data[0]:
 				if start_point != node:
@@ -166,11 +164,7 @@ func _on_btn_run_pressed():
 	GameData.mission_waves.clear()
 	for node in selected_nodes:
 		if node.state == node.SelfState.LOCKED or node.state == node.SelfState.SELECTED:
-			GameData.mission_waves.append({
-				"type":node.type,
-				"hazards":node.hazards,
-				"coords":node.coords,
-			})
+			GameData.mission_waves.append(node)
 	GameData.build_mission()
 	mission_confirmed.emit()
 

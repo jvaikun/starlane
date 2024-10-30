@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://f3v631cpq70r"]
+[gd_scene load_steps=18 format=3 uid="uid://f3v631cpq70r"]
 
 [ext_resource type="Texture2D" uid="uid://2u4fu5eycj8x" path="res://player/player0.png" id="1"]
 [ext_resource type="Script" path="res://player/player.gd" id="2"]
@@ -8,6 +8,9 @@
 [ext_resource type="Shader" path="res://player/teleport.gdshader" id="5_vog3e"]
 
 [sub_resource type="CircleShape2D" id="1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lrw1w"]
+radius = 128.25
 
 [sub_resource type="CircleShape2D" id="5"]
 radius = 128.0
@@ -144,6 +147,9 @@ shape = SubResource("1")
 [node name="SpecialTimer" type="Timer" parent="."]
 one_shot = true
 
+[node name="TractorTimer" type="Timer" parent="."]
+wait_time = 0.2
+
 [node name="FirePos1" type="Marker2D" parent="."]
 position = Vector2(-3, -18)
 
@@ -155,6 +161,11 @@ position = Vector2(-12, 3)
 
 [node name="FirePos4" type="Marker2D" parent="."]
 position = Vector2(12, 3)
+
+[node name="Tractor" type="Area2D" parent="."]
+
+[node name="Collision" type="CollisionShape2D" parent="Tractor"]
+shape = SubResource("CircleShape2D_lrw1w")
 
 [node name="Radius" type="Area2D" parent="."]
 
@@ -201,5 +212,7 @@ libraries = {
 [connection signal="timeout" from="ShootTimer2" to="." method="_on_ShootTimer2_timeout"]
 [connection signal="timeout" from="ShieldRegen" to="." method="_on_ShieldRegen_timeout"]
 [connection signal="timeout" from="SpecialTimer" to="." method="_on_SpecialTimer_timeout"]
+[connection signal="timeout" from="TractorTimer" to="." method="_on_tractor_timer_timeout"]
+[connection signal="area_entered" from="Tractor" to="." method="_on_tractor_area_entered"]
 [connection signal="area_entered" from="Radius" to="." method="_on_Radius_area_entered"]
 [connection signal="area_entered" from="Beam" to="." method="_on_Beam_area_entered"]

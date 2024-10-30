@@ -2,14 +2,24 @@ extends Button
 
 enum SelfState {INACTIVE, ACTIVE, SELECTED, LOCKED}
 
-const INFO_TEXT = "Type: %s\nHazards: %s"
+const INFO_TEXT = "Type: %s\nHazard: %s"
 
 var state = SelfState.INACTIVE : set = set_state
 
 # Link list item: {node, line}
+var id : String = ""
 var type : String = "assault"
 var desc : String = "Assault"
-var hazards : Array = ["None"]
+var data : Dictionary = {
+	"loot_level" : 1,
+	"loot_multiplier" : 1,
+	"loot_value" : 0,
+	"enemy_level" : 1,
+	"enemy_multiplier" : 1,
+	"enemy_amount" : 1,
+	"hazard_level" : 1,
+	"hazard_type" : "none",
+}
 var coords : Vector2 = Vector2.ZERO
 var lines : Array = []
 var node_next : Array = []
@@ -83,7 +93,7 @@ func clear_nodes():
 
 
 func _on_mouse_entered():
-	node_hovered.emit(INFO_TEXT % [type, ", ".join(hazards)])
+	node_hovered.emit(INFO_TEXT % [type, data.hazard_type])
 
 
 func _on_pressed():

@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://b3hnuljs4fn0a"]
+[gd_scene load_steps=10 format=3 uid="uid://b3hnuljs4fn0a"]
 
 [ext_resource type="Script" path="res://items/cargo.gd" id="1_mubyp"]
 [ext_resource type="Texture2D" uid="uid://ck0o4j8ie7n4m" path="res://enemies/enemy_target.png" id="1_xek2j"]
+[ext_resource type="FontFile" uid="uid://cb0k0ah7erqsl" path="res://ui/fonts/Kenney Mini Square.ttf" id="3_g6x81"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_51hxh"]
 size = Vector2(46, 34)
@@ -42,9 +43,13 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="Cargo" type="Area2D"]
+[node name="Cargo" type="Area2D" groups=["cargo"]]
 texture_filter = 1
 script = ExtResource("1_mubyp")
+
+[node name="VisCheck" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(0, -4.76837e-07)
+scale = Vector2(2.3, 1.7)
 
 [node name="Collision" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_51hxh")
@@ -53,3 +58,24 @@ shape = SubResource("RectangleShape2D_51hxh")
 sprite_frames = SubResource("SpriteFrames_qigcl")
 autoplay = "default"
 frame_progress = 0.033608
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_g6x81")
+text = "000"
+horizontal_alignment = 1
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisCheck" to="." method="_on_vis_check_screen_exited"]

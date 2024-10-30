@@ -13,11 +13,6 @@ var destination = 0
 
 signal boss_dead
 
-func set_hp(value):
-	hp = value
-	if hp <= 0:
-		emit_signal("boss_dead")
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -45,6 +40,10 @@ func _process(_delta):
 			destination = 0
 	else:
 		direction = (path[destination] - self.global_position)
+
+
+func die():
+	boss_dead.emit()
 
 
 func _on_hit_handler(area, index):

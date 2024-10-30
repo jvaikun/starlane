@@ -15,23 +15,20 @@ var shot_pattern = []
 var shot_time = 1.0
 var move_pattern = Resource.new()
 
-signal enemy_dead
+signal enemy_dead(score)
+
 
 func set_hp(value):
 	hp = value
 	if hp <= 0:
-		emit_signal("enemy_dead", score_value)
-		var explode_inst = explode_obj.instantiate()
-		get_parent().add_child(explode_inst)
-		explode_inst.global_position = global_position
-		queue_free()
+		die()
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$ShootTimer.start(shot_time)
 	move_pattern = Resource.new()
-	move_pattern.set_script(load("res://data/MoveDown.gd"))
+	move_pattern.set_script(load("res://data/move_down.gd"))
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -46,6 +43,15 @@ func shoot():
 		get_parent().add_child(bullet_inst)
 		bullet_inst.global_position = shot.pos.global_position
 		bullet_inst.velocity = shot.velocity
+
+
+func die():
+	if !is_queued_for_deletion():
+		enemy_dead.emit(score_value)
+		var explode_inst = explode_obj.instantiate()
+		get_parent().add_child(explode_inst)
+		explode_inst.global_position = global_position
+		queue_free()
 
 
 func _on_VisCheck_screen_exited():
